@@ -144,7 +144,7 @@ export const LeftPanel: React.FC<LeftPanelProps> = ({
           <button 
             onClick={handleInputSubmit}
             disabled={!inputText.trim() || isAnalyzing || isChatting}
-            className="absolute bottom-3 right-3 p-2 flex items-center justify-center bg-blue-600 text-white hover:bg-blue-500 disabled:opacity-50 disabled:hover:bg-blue-600 transition-colors group"
+            className="absolute mb-1 bottom-3 right-3 p-2 flex items-center justify-center bg-blue-600 text-white hover:bg-blue-500 disabled:opacity-50 disabled:hover:bg-blue-600 transition-colors group"
           >
             <CornerAccents className="border-blue-300 group-hover:border-white" size="w-0.5 h-0.5" />
             {isComplete ? <Send size={16} /> : <ArrowRight size={16} />}
