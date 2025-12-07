@@ -92,7 +92,7 @@ export const analyzePaper = async (content: { images?: string[], text?: string }
 
   // Add the prompt as the last part
   const systemPrompt = `
-    You are a precise scientific research assistant. Analyze the provided ${isTextOnly ? 'text' : 'images'} of a research paper. 
+    You are a precise scientific research assistant. Analyze the provided ${isTextOnly ? 'text' : 'images'} of a research paper (or set of documents). 
     Perform a multimodal analysis: extract text${isTextOnly ? '' : ' and visually interpret all figures, tables, and charts'}.
     
     Return a strictly valid JSON object matching the requested schema.
@@ -144,7 +144,7 @@ export const chatWithPaper = async (
 
   // Construct a concise context from the structured analysis
   const context = `
-    You are a helpful research assistant. You have already analyzed a paper. 
+    You are a helpful research assistant. You have already analyzed a paper (or documents). 
     Here is the structured data you extracted:
     Title: ${currentAnalysis.paper_title}
     Hypothesis: ${currentAnalysis.core_hypothesis}

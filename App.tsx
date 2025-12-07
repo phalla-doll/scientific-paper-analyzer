@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Upload, Bot, AlertCircle, CheckCircle2, Sparkles, Send, RefreshCw, MessageSquare } from 'lucide-react';
+import { Upload, Bot, AlertCircle, CheckCircle2, Sparkles, Send, RefreshCw, MessageSquare, FileText, X, Plus, Play } from 'lucide-react';
 import { JsonDisplay } from './components/JsonDisplay';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { convertPdfToImages } from './utils/pdfUtils';
@@ -125,7 +125,7 @@ const App: React.FC = () => {
     }
   ]);
   const [analysis, setAnalysis] = useState<PaperAnalysis | null>(null);
-  const [currentFile, setCurrentFile] = useState<File | null>(null);
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [inputText, setInputText] = useState('');
   const [isChatting, setIsChatting] = useState(false);
   
@@ -179,7 +179,7 @@ const App: React.FC = () => {
     trackEvent('analyze_text_submitted', { text_length: textToAnalyze.length });
 
     setAnalysis(null);
-    setCurrentFile({ name: 'Text Snippet Analysis' } as File);
+    setSelectedFiles([]);
     setAppState(AppState.ANALYZING);
     
     addMessage('user', 'Submitted text for analysis.');
@@ -202,50 +202,65 @@ const App: React.FC = () => {
     }
   };
 
-  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
-      if (file.type !== 'application/pdf') {
-        addMessage('system', 'Please upload a valid PDF file.');
-        return;
-      }
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      const newFiles = Array.from(e.target.files).filter(f => f.type === 'application/pdf');
       
-      trackEvent('upload_pdf_started', { file_size: file.size });
-
-      setCurrentFile(file);
-      setAnalysis(null);
-      setAppState(AppState.PROCESSING_PDF);
-      
-      addMessage('user', `Uploaded: ${file.name}`);
-      addMessage('assistant', `Processing '${file.name}' for multimodal analysis...`);
-
-      try {
-        const images = await convertPdfToImages(file);
-        setAppState(AppState.ANALYZING);
-        addMessage('assistant', 'Derendering document and interpreting visuals...');
-        
-        const result = await analyzePaper({ images });
-        
-        setAnalysis(result);
-        setAppState(AppState.COMPLETE);
-        addMessage('assistant', 'Analysis complete. Structured data extracted.');
-        addMessage('assistant', 'System is ready for Q&A. Type below to query the paper.');
-        
-        trackEvent('analyze_pdf_completed', { page_count: images.length });
-
-      } catch (error: any) {
-        console.error(error);
-        setAppState(AppState.ERROR);
-        addMessage('assistant', `Error processing document: ${error.message || 'Unknown error'}`);
-        trackEvent('analyze_pdf_failed', { message: error.message });
+      if (newFiles.length === 0) {
+         addMessage('system', 'Please upload valid PDF files.');
+         return;
       }
+
+      setSelectedFiles(prev => [...prev, ...newFiles]);
+      trackEvent('files_selected', { count: newFiles.length });
+      
+      // Reset input so duplicate selection is possible if needed
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
+
+  const handleRemoveFile = (index: number) => {
+    setSelectedFiles(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const handleAnalyzeFiles = async () => {
+    if (selectedFiles.length === 0) return;
+
+    setAppState(AppState.PROCESSING_PDF);
+    const fileNames = selectedFiles.map(f => f.name).join(', ');
+    addMessage('user', `Uploaded ${selectedFiles.length} document(s): ${fileNames}`);
+    addMessage('assistant', `Processing ${selectedFiles.length} document(s) for multimodal analysis...`);
+    trackEvent('batch_analysis_started', { file_count: selectedFiles.length });
+
+    try {
+      // Convert all PDFs to images in parallel
+      const allImagesArrays = await Promise.all(selectedFiles.map(f => convertPdfToImages(f)));
+      const images = allImagesArrays.flat();
+      
+      setAppState(AppState.ANALYZING);
+      addMessage('assistant', `Derendering documents (${images.length} total pages) and interpreting visuals...`);
+      
+      const result = await analyzePaper({ images });
+      
+      setAnalysis(result);
+      setAppState(AppState.COMPLETE);
+      addMessage('assistant', 'Analysis complete. Structured data extracted.');
+      addMessage('assistant', 'System is ready for Q&A. Type below to query the documents.');
+      
+      trackEvent('analyze_pdf_completed', { page_count: images.length });
+
+    } catch (error: any) {
+      console.error(error);
+      setAppState(AppState.ERROR);
+      addMessage('assistant', `Error processing documents: ${error.message || 'Unknown error'}`);
+      trackEvent('analyze_pdf_failed', { message: error.message });
     }
   };
 
   const handleReset = () => {
     trackEvent('app_reset');
     setAnalysis(null);
-    setCurrentFile(null);
+    setSelectedFiles([]);
     setAppState(AppState.IDLE);
     setMessages([{
       id: 'reset',
@@ -257,6 +272,13 @@ const App: React.FC = () => {
 
   const isIdle = appState === AppState.IDLE || appState === AppState.ERROR;
   const isComplete = appState === AppState.COMPLETE;
+
+  const getHeaderText = () => {
+    if (!analysis) return 'System Ready';
+    if (selectedFiles.length === 1) return `FILE: ${selectedFiles[0].name}`;
+    if (selectedFiles.length > 1) return `FILES: ${selectedFiles.length} Documents`;
+    return 'TEXT ANALYSIS';
+  };
 
   return (
     <div className="flex h-screen w-full bg-[#09090b] text-zinc-200 overflow-hidden font-sans tracking-wide selection:bg-blue-500/30">
@@ -374,25 +396,75 @@ const App: React.FC = () => {
                     <div className="h-px bg-zinc-800 flex-1"></div>
                 </div>
                 
-                <input
-                    type="file"
-                    ref={fileInputRef}
-                    onChange={handleFileSelect}
-                    className="hidden"
-                    accept=".pdf"
-                />
-                
-                <button
-                onClick={() => fileInputRef.current?.click()}
-                disabled={!isIdle}
-                className="group w-full h-20 border border-zinc-800 hover:border-blue-500/50 bg-zinc-900 hover:bg-blue-900/10 transition-all duration-300 flex flex-col items-center justify-center gap-2 relative focus:outline-none disabled:opacity-50"
-                >
-                <CornerAccents className="border-zinc-800 group-hover:border-blue-500/50 transition-colors" />
-                <div className="flex items-center gap-2 text-zinc-500 group-hover:text-blue-400 transition-colors">
-                    <Upload className="w-4 h-4" />
-                    <span className="text-xs font-bold uppercase tracking-widest">Upload PDF</span>
+                {/* File List if files selected */}
+                {selectedFiles.length > 0 && (
+                  <div className="space-y-2 mb-4 animate-in fade-in slide-in-from-bottom-2">
+                    <div className="max-h-32 overflow-y-auto space-y-2 pr-1 custom-scrollbar">
+                      {selectedFiles.map((file, idx) => (
+                        <div key={idx} className="flex items-center justify-between bg-zinc-950 border border-zinc-800 p-2 group hover:border-zinc-600 transition-colors">
+                           <div className="flex items-center gap-2 overflow-hidden">
+                             <FileText size={14} className="text-zinc-500 group-hover:text-blue-400 shrink-0" />
+                             <span className="text-xs text-zinc-400 truncate font-mono">{file.name}</span>
+                           </div>
+                           <button 
+                             onClick={() => handleRemoveFile(idx)}
+                             className="text-zinc-600 hover:text-red-400 p-1"
+                             title="Remove file"
+                           >
+                             <X size={12} />
+                           </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                <div className="flex gap-2">
+                    <input
+                        type="file"
+                        ref={fileInputRef}
+                        onChange={handleFileSelect}
+                        className="hidden"
+                        accept=".pdf"
+                        multiple
+                    />
+                    
+                    {/* Upload/Add Button */}
+                    <button
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={!isIdle}
+                    className={`group border border-zinc-800 hover:border-blue-500/50 bg-zinc-900 hover:bg-blue-900/10 transition-all duration-300 flex flex-col items-center justify-center gap-2 relative focus:outline-none disabled:opacity-50
+                      ${selectedFiles.length > 0 ? 'w-1/3 h-12' : 'w-full h-20'}
+                    `}
+                    title="Upload PDF(s)"
+                    >
+                    <CornerAccents className="border-zinc-800 group-hover:border-blue-500/50 transition-colors" />
+                    {selectedFiles.length > 0 ? (
+                       <Plus className="w-5 h-5 text-zinc-500 group-hover:text-blue-400" />
+                    ) : (
+                      <>
+                        <div className="flex items-center gap-2 text-zinc-500 group-hover:text-blue-400 transition-colors">
+                            <Upload className="w-4 h-4" />
+                            <span className="text-xs font-bold uppercase tracking-widest">Upload PDF</span>
+                        </div>
+                      </>
+                    )}
+                    </button>
+
+                    {/* Analyze Button (Only visible if files selected) */}
+                    {selectedFiles.length > 0 && (
+                      <button
+                        onClick={handleAnalyzeFiles}
+                        className="group flex-1 border border-blue-900/50 bg-blue-600 hover:bg-blue-500 text-white transition-all duration-300 flex items-center justify-center gap-2 relative focus:outline-none h-12"
+                      >
+                         <CornerAccents className="border-blue-400" />
+                         <Play size={14} fill="currentColor" />
+                         <span className="text-xs font-bold uppercase tracking-widest">
+                           Analyze {selectedFiles.length > 1 ? `(${selectedFiles.length})` : ''}
+                         </span>
+                      </button>
+                    )}
                 </div>
-                </button>
             </>
           )}
         </div>
@@ -400,7 +472,7 @@ const App: React.FC = () => {
 
       {/* RIGHT PANEL */}
       <div className="flex-1 bg-[#09090b] h-full overflow-y-auto relative custom-scrollbar">
-        {!currentFile ? (
+        {!analysis && appState === AppState.IDLE ? (
           <div className="h-full flex flex-col items-center justify-center text-zinc-600">
             <div className="w-16 h-16 border border-zinc-800 bg-zinc-900 flex items-center justify-center mb-6 relative">
               <CornerAccents className="border-zinc-700" />
@@ -413,7 +485,7 @@ const App: React.FC = () => {
           <div className="p-8 max-w-4xl mx-auto min-h-full">
             <div className="flex items-center justify-between mb-8 sticky top-0 bg-[#09090b]/95 backdrop-blur z-20 py-4 border-b border-zinc-800 transition-all">
                 <h2 className="text-xs font-mono text-zinc-500 truncate max-w-md uppercase">
-                   FILE: {currentFile.name}
+                   {getHeaderText()}
                 </h2>
                 <div className="flex items-center gap-2">
                    {appState === AppState.COMPLETE && (
@@ -440,7 +512,7 @@ const App: React.FC = () => {
                     onReset={() => {
                         setAnalysis(null);
                         setAppState(AppState.IDLE);
-                        setCurrentFile(null);
+                        setSelectedFiles([]);
                         setMessages(prev => [...prev, {
                             id: Date.now().toString(),
                             role: 'system',
