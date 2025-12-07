@@ -169,15 +169,15 @@ export const LeftPanel: React.FC<LeftPanelProps> = ({
         <div className="mt-4 pt-4 border-t border-dashed border-zinc-200 dark:border-zinc-800 flex justify-between items-center text-[10px] text-zinc-400 dark:text-zinc-600 font-mono tracking-widest uppercase">
           <div className="flex items-center gap-1">
              <Cpu size={10} />
-             <span>System v3.0.4</span>
+             <span>System v1.0.0</span>
           </div>
-          <div className="flex items-baseline gap-1">
+          <div className="flex items-center gap-1">
             <span>Made with Gemini-3 by </span>
             <a 
               href="https://mantha.vercel.app/?utm_source=scientific-paper-analyzer" 
               target="_blank" 
               rel="noopener noreferrer"
-              className="text-zinc-500 dark:text-zinc-500 border-b border-dashed border-transparent hover:text-blue-600 dark:hover:text-blue-400 hover:border-blue-600 dark:hover:border-blue-400 transition-colors pb-0.5"
+              className="text-zinc-500 dark:text-zinc-500 -mb-[3px] border-b border-dashed border-transparent hover:text-blue-600 dark:hover:text-blue-400 hover:border-blue-600 dark:hover:border-blue-400 transition-colors pb-0.5"
             >
               mantha
             </a>
