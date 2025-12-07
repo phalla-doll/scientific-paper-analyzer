@@ -64,7 +64,7 @@ export const LeftPanel: React.FC<LeftPanelProps> = ({
           {/* Theme Toggle */}
           <button
             onClick={toggleTheme}
-            className="p-2 text-zinc-500 hover:text-blue-500 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+            className="p-2 flex items-center justify-center text-zinc-500 hover:text-blue-500 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
             title={`Switch to ${isDarkMode ? 'Light' : 'Dark'} Mode`}
           >
             {isDarkMode ? <Sun size={16} /> : <Moon size={16} />}
@@ -73,7 +73,7 @@ export const LeftPanel: React.FC<LeftPanelProps> = ({
           {isComplete && (
             <button 
                 onClick={handleReset}
-                className="p-2 text-zinc-500 hover:text-blue-500 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+                className="p-2 flex items-center justify-center text-zinc-500 hover:text-blue-500 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
                 title="Reset Analysis"
             >
                 <RefreshCw size={16} />
@@ -107,7 +107,7 @@ export const LeftPanel: React.FC<LeftPanelProps> = ({
                     ? 'text-sm leading-relaxed bg-zinc-100 border-zinc-200 text-zinc-800 dark:bg-zinc-800/50 dark:border-zinc-700 dark:text-zinc-200 p-3' 
                     : msg.role === 'assistant'
                     ? 'text-sm leading-relaxed bg-blue-50 border-blue-100 text-zinc-800 dark:bg-blue-950/20 dark:border-blue-900/50 dark:text-blue-100 py-2.5 px-3'
-                    : 'text-xs leading-4 font-mono bg-transparent border-transparent text-zinc-500 py-2 px-3'
+                    : 'text-xs leading-4 py-2 px-3 font-mono bg-transparent border-transparent text-zinc-500'
                 }`}
                 >
                   {msg.role !== 'system' && (
@@ -144,7 +144,7 @@ export const LeftPanel: React.FC<LeftPanelProps> = ({
           <button 
             onClick={handleInputSubmit}
             disabled={!inputText.trim() || isAnalyzing || isChatting}
-            className="absolute bottom-3 right-3 p-2 bg-blue-600 text-white hover:bg-blue-500 disabled:opacity-50 disabled:hover:bg-blue-600 transition-colors group"
+            className="absolute bottom-3 right-3 p-2 flex items-center justify-center bg-blue-600 text-white hover:bg-blue-500 disabled:opacity-50 disabled:hover:bg-blue-600 transition-colors group"
           >
             <CornerAccents className="border-blue-300 group-hover:border-white" size="w-0.5 h-0.5" />
             {isComplete ? <Send size={16} /> : <ArrowRight size={16} />}
