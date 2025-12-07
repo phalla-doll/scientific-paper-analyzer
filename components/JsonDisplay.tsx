@@ -6,6 +6,7 @@ import {
   FlaskConical, Binary, Layers, PenTool, Beaker, Download, Workflow, Settings2, Cpu,
   FileText
 } from 'lucide-react';
+import { CornerAccents } from './CornerAccents';
 
 export interface JsonDisplayRef {
   copyJson: () => Promise<void>;
@@ -15,16 +16,6 @@ export interface JsonDisplayRef {
 interface JsonDisplayProps {
   data: PaperAnalysis;
 }
-
-// Reusable Corner Accent Component for that "Tech/HUD" look
-const CornerAccents = ({ color = "border-zinc-700", size = "w-1.5 h-1.5" }) => (
-  <>
-    <div className={`absolute top-0 left-0 ${size} border-l border-t ${color}`} />
-    <div className={`absolute top-0 right-0 ${size} border-r border-t ${color}`} />
-    <div className={`absolute bottom-0 left-0 ${size} border-l border-b ${color}`} />
-    <div className={`absolute bottom-0 right-0 ${size} border-r border-b ${color}`} />
-  </>
-);
 
 export const JsonDisplay = forwardRef<JsonDisplayRef, JsonDisplayProps>(({ data }, ref) => {
   const [copied, setCopied] = useState(false);
@@ -155,7 +146,7 @@ export const JsonDisplay = forwardRef<JsonDisplayRef, JsonDisplayProps>(({ data 
         </h4>
         
         <div className="font-mono text-xs bg-zinc-950/50 p-4 border border-zinc-800/80 relative">
-          <CornerAccents color="border-zinc-700" size="w-1 h-1" />
+          <CornerAccents className="border-zinc-700" size="w-1 h-1" />
           
           <div className="space-y-1">
             {validPoints.map((p, idx) => {
@@ -254,7 +245,7 @@ export const JsonDisplay = forwardRef<JsonDisplayRef, JsonDisplayProps>(({ data 
                   }`}
                 title="Copy JSON to clipboard"
               >
-                <CornerAccents color={copied ? "border-emerald-800" : "border-zinc-700 group-hover:border-blue-500/50"} size="w-1 h-1"/>
+                <CornerAccents className={copied ? "border-emerald-800" : "border-zinc-700 group-hover:border-blue-500/50"} size="w-1 h-1"/>
                 {copied ? <Check size={14} className="text-emerald-500" /> : <Copy size={14} />}
                 {copied ? 'COPIED' : 'COPY JSON'}
               </button>
@@ -264,7 +255,7 @@ export const JsonDisplay = forwardRef<JsonDisplayRef, JsonDisplayProps>(({ data 
                 className="group relative flex items-center gap-2 text-xs font-medium transition-all border px-4 py-2 bg-zinc-900 text-zinc-400 border-zinc-700 hover:text-blue-400 hover:border-blue-500/50 hover:bg-blue-950/20 uppercase tracking-wide"
                 title="Download Analysis Report (.md)"
               >
-                <CornerAccents color="border-zinc-700 group-hover:border-blue-500/50" size="w-1 h-1"/>
+                <CornerAccents className="border-zinc-700 group-hover:border-blue-500/50" size="w-1 h-1"/>
                 <Download size={14} />
                 EXPORT REPORT
               </button>
@@ -309,7 +300,7 @@ export const JsonDisplay = forwardRef<JsonDisplayRef, JsonDisplayProps>(({ data 
                       {stage.stage_name}
                     </h4>
                     <div className="relative bg-zinc-900/30 border border-zinc-800 p-5 hover:border-blue-900 transition-colors">
-                      <CornerAccents color="border-zinc-800 group-hover:border-blue-900" />
+                      <CornerAccents className="border-zinc-800 group-hover:border-blue-900" />
                       <ul className="space-y-2.5">
                         {stage.steps.map((step, sIdx) => (
                           <li key={sIdx} className="text-sm text-zinc-400 leading-snug flex gap-3 items-start">
@@ -402,7 +393,7 @@ export const JsonDisplay = forwardRef<JsonDisplayRef, JsonDisplayProps>(({ data 
 
              return (
                 <div key={idx} className="group relative bg-zinc-900/30 border border-zinc-800 p-6 transition-all duration-200 hover:border-zinc-600">
-                    <CornerAccents color="border-zinc-800 group-hover:border-zinc-600" />
+                    <CornerAccents className="border-zinc-800 group-hover:border-zinc-600" />
                     <div className="flex flex-col sm:flex-row justify-between items-start gap-4 mb-6">
                         <div className="flex items-start gap-4">
                            <div className={`p-2.5 shrink-0 border ${iconStyles}`}>
@@ -465,7 +456,7 @@ export const JsonDisplay = forwardRef<JsonDisplayRef, JsonDisplayProps>(({ data 
             </button>
         </div>
         <div className="bg-zinc-900/30 border border-zinc-800 p-5 text-zinc-300 text-sm leading-relaxed relative hover:border-zinc-700 transition-colors">
-            <CornerAccents color="border-zinc-700" />
+            <CornerAccents className="border-zinc-700" />
             <p>
                 <span className="text-blue-400 font-bold uppercase text-[10px] tracking-wider mr-2">Hypothesis</span> 
                 {data.core_hypothesis}
