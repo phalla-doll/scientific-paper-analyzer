@@ -101,38 +101,62 @@ export const JsonDisplay: React.FC<JsonDisplayProps> = ({ data }) => {
   const renderDataChart = (points: DataPoint[]) => {
     if (!points || points.length === 0) return null;
     
+    const validPoints = points.filter(p => typeof p.value === 'number');
+    if (validPoints.length === 0) return null;
+
     // Find max value for scaling
-    const maxValue = Math.max(...points.map(p => p.value));
+    const maxValue = Math.max(...validPoints.map(p => p.value));
     const maxBarChars = 20;
     
     return (
-      <div className="mt-4 pt-3 border-t border-zinc-800">
-        <h4 className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+      <div className="mt-5 pt-4 border-t border-dashed border-zinc-800/50">
+        <h4 className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-3 flex items-center gap-1.5">
           <Activity size={12} className="text-blue-500" /> 
           Data Distribution
         </h4>
-        <div className="font-mono text-xs bg-zinc-950 p-4 border border-zinc-800 overflow-x-auto relative">
+        
+        <div className="font-mono text-xs bg-zinc-950/50 p-4 border border-zinc-800/80 relative">
           <CornerAccents color="border-zinc-700" size="w-1 h-1" />
-          {points.map((p, idx) => {
-            const filledCount = Math.max(0, Math.round((p.value / maxValue) * maxBarChars));
-            const emptyCount = Math.max(0, maxBarChars - filledCount);
-            const filled = '█'.repeat(filledCount);
-            const empty = '░'.repeat(emptyCount);
+          
+          <div className="space-y-1">
+            {validPoints.map((p, idx) => {
+              const filledCount = Math.max(0, Math.round((p.value / maxValue) * maxBarChars));
+              const emptyCount = Math.max(0, maxBarChars - filledCount);
+              const filled = '█'.repeat(filledCount);
+              const empty = '░'.repeat(emptyCount);
 
-            return (
-              <div key={idx} className="flex items-center gap-3 leading-relaxed hover:bg-zinc-900 px-1 -mx-1 transition-colors">
-                 <span className="w-24 truncate text-zinc-500 text-right shrink-0" title={p.label}>{p.label}</span>
-                 <span className="text-blue-500 tracking-tight select-none">
-                    {filled}
-                    <span className="text-zinc-800">{empty}</span>
-                 </span>
-                 <span className="shrink-0 text-zinc-300 font-semibold tabular-nums">
-                    {p.value}
-                    {p.unit && <span className="text-[10px] text-zinc-600 ml-0.5 font-normal">{p.unit}</span>}
-                 </span>
-              </div>
-            );
-          })}
+              return (
+                <div key={idx} className="flex items-center gap-3 hover:bg-zinc-900 py-0.5 transition-colors group">
+                   {/* Axis Label */}
+                   <div className="w-24 text-right shrink-0 border-r border-zinc-800 pr-3 group-hover:border-zinc-700 transition-colors">
+                     <span className="text-zinc-400 truncate block" title={p.label}>{p.label}</span>
+                   </div>
+                   
+                   {/* Bar Area */}
+                   <div className="flex items-center gap-3">
+                     <div className="relative" title={`${p.value} ${p.unit || ''}`}>
+                        <span className="text-blue-500 tracking-tighter select-none drop-shadow-[0_0_8px_rgba(59,130,246,0.3)]">{filled}</span>
+                        <span className="text-zinc-800 tracking-tighter select-none">{empty}</span>
+                     </div>
+                     <span className="text-zinc-300 font-bold tabular-nums">
+                        {p.value}
+                        {p.unit && <span className="text-[10px] text-zinc-600 ml-1 font-normal">{p.unit}</span>}
+                     </span>
+                   </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* X-Axis Scale Indicators */}
+          <div className="flex items-center gap-3 mt-2 text-[9px] text-zinc-600 font-mono">
+            <div className="w-24 shrink-0 pr-3 text-right opacity-0">Labels</div> {/* Spacer */}
+            <div className="flex justify-between w-[20ch] tracking-tighter px-[1px]">
+               <span>0</span>
+               <span>{Math.round(maxValue / 2)}</span>
+               <span>{maxValue}</span>
+            </div>
+          </div>
         </div>
       </div>
     );
