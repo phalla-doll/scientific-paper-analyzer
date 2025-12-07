@@ -102,12 +102,12 @@ export const LeftPanel: React.FC<LeftPanelProps> = ({
                 {msg.role === 'assistant' ? <Bot size={16} /> : msg.role === 'user' ? <MessageSquare size={16} /> : <Bot size={16} className="opacity-50" />}
                 </div>
                 
-                <div className={`max-w-[85%] text-sm leading-relaxed border relative
+                <div className={`max-w-[85%] border relative
                 ${msg.role === 'user' 
-                    ? 'bg-zinc-100 border-zinc-200 text-zinc-800 dark:bg-zinc-800/50 dark:border-zinc-700 dark:text-zinc-200 p-3' 
+                    ? 'text-sm leading-relaxed bg-zinc-100 border-zinc-200 text-zinc-800 dark:bg-zinc-800/50 dark:border-zinc-700 dark:text-zinc-200 p-3' 
                     : msg.role === 'assistant'
-                    ? 'bg-blue-50 border-blue-100 text-zinc-800 dark:bg-blue-950/20 dark:border-blue-900/50 dark:text-blue-100 py-2.5 px-3'
-                    : 'bg-transparent border-transparent text-zinc-500 font-mono text-xs py-2.5 px-3'
+                    ? 'text-sm leading-relaxed bg-blue-50 border-blue-100 text-zinc-800 dark:bg-blue-950/20 dark:border-blue-900/50 dark:text-blue-100 py-2.5 px-3'
+                    : 'text-xs leading-4 font-mono bg-transparent border-transparent text-zinc-500 py-2 px-3'
                 }`}
                 >
                   {msg.role !== 'system' && (
