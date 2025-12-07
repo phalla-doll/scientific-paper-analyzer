@@ -14,7 +14,6 @@ export const AnalysisLoader: React.FC<AnalysisLoaderProps> = ({ appState }) => {
       setInternalStage(1);
     } else if (appState === AppState.ANALYZING) {
       setInternalStage(2);
-      // Simulate transition to Synthesis phase after a few seconds of Analysis
       const timer = setTimeout(() => setInternalStage(3), 4000);
       return () => clearTimeout(timer);
     }
@@ -48,20 +47,20 @@ export const AnalysisLoader: React.FC<AnalysisLoaderProps> = ({ appState }) => {
       {/* Central Tech Graphic */}
       <div className="relative w-24 h-24 mb-12">
         {/* Outer Ring */}
-        <div className="absolute inset-0 border border-blue-900/40 rounded-none transform rotate-45 loader-spin" />
-        <div className="absolute inset-0 border border-blue-900/40 rounded-none transform -rotate-45 loader-spin-reverse" />
+        <div className="absolute inset-0 border border-blue-200 dark:border-blue-900/40 rounded-none transform rotate-45 loader-spin" />
+        <div className="absolute inset-0 border border-blue-200 dark:border-blue-900/40 rounded-none transform -rotate-45 loader-spin-reverse" />
         
         {/* Active Ring */}
         <div className="absolute inset-2 border-t-2 border-r-2 border-blue-500 rounded-none loader-spin" />
         
         {/* Core */}
-        <div className="absolute inset-[30%] bg-blue-950/30 border border-blue-500/30 flex items-center justify-center shadow-[0_0_25px_rgba(59,130,246,0.2)]">
-           <div className="w-1.5 h-1.5 bg-blue-400 loader-pulse shadow-[0_0_10px_rgba(59,130,246,0.8)]" />
+        <div className="absolute inset-[30%] bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-500/30 flex items-center justify-center shadow-[0_0_25px_rgba(59,130,246,0.2)]">
+           <div className="w-1.5 h-1.5 bg-blue-500 loader-pulse shadow-[0_0_10px_rgba(59,130,246,0.8)]" />
         </div>
 
         {/* HUD Accents */}
-        <div className="absolute -top-2 -left-2 w-2 h-2 border-t border-l border-blue-800" />
-        <div className="absolute -bottom-2 -right-2 w-2 h-2 border-b border-r border-blue-800" />
+        <div className="absolute -top-2 -left-2 w-2 h-2 border-t border-l border-blue-300 dark:border-blue-800" />
+        <div className="absolute -bottom-2 -right-2 w-2 h-2 border-b border-r border-blue-300 dark:border-blue-800" />
       </div>
 
       {/* Status Steps */}
@@ -83,12 +82,12 @@ export const AnalysisLoader: React.FC<AnalysisLoaderProps> = ({ appState }) => {
                   <div className="w-2 h-2 bg-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.8)] loader-pulse" />
                 )}
                 {status === 'pending' && (
-                  <div className="w-1.5 h-1.5 bg-zinc-800" />
+                  <div className="w-1.5 h-1.5 bg-zinc-300 dark:bg-zinc-800" />
                 )}
               </div>
               
-              <div className="flex-1 flex justify-between items-baseline border-b border-dashed border-zinc-800 pb-2">
-                <span className={`text-[10px] tracking-[0.2em] font-bold ${status === 'active' ? 'text-blue-400' : 'text-zinc-600'}`}>
+              <div className="flex-1 flex justify-between items-baseline border-b border-dashed border-zinc-300 dark:border-zinc-800 pb-2">
+                <span className={`text-[10px] tracking-[0.2em] font-bold ${status === 'active' ? 'text-blue-600 dark:text-blue-400' : 'text-zinc-500 dark:text-zinc-600'}`}>
                   {step.label}
                 </span>
                 {status === 'active' && (

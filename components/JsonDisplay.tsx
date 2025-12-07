@@ -95,12 +95,9 @@ export const JsonDisplay = forwardRef<JsonDisplayRef, JsonDisplayProps>(({ data 
             }
             if (fig.data_points && fig.data_points.length > 0) {
                 mdContent += `\n**Extracted Data:**\n`;
-                
-                // Generate ASCII Bar Chart for Markdown
                 const values = fig.data_points.map((p: any) => p.value);
                 const maxVal = Math.max(...values, 0) || 1;
                 const maxLabelWidth = Math.max(...fig.data_points.map((p: any) => p.label.length), 10);
-                
                 mdContent += "```text\n";
                 fig.data_points.forEach((dp: any) => {
                     const barLen = Math.floor((dp.value / maxVal) * 20);
@@ -135,54 +132,46 @@ export const JsonDisplay = forwardRef<JsonDisplayRef, JsonDisplayProps>(({ data 
     const validPoints = points.filter(p => typeof p.value === 'number');
     if (validPoints.length === 0) return null;
 
-    // Analysis for scale selection
     const values = validPoints.map(p => p.value);
     const maxValue = Math.max(...values);
     const minValue = Math.min(...values);
     const positives = values.filter(v => v > 0);
     const minPositive = positives.length > 0 ? Math.min(...positives) : 0.0001;
 
-    // Use log scale if dynamic range > 1000 and values are positive
     const rangeRatio = minPositive > 0 ? maxValue / minPositive : 0;
     const useLogScale = minValue >= 0 && rangeRatio > 1000;
     
     const maxBarChars = 24;
     
     return (
-      <div className="mt-5 pt-4 border-t border-dashed border-zinc-800/50">
+      <div className="mt-5 pt-4 border-t border-dashed border-zinc-200 dark:border-zinc-800/50">
         <div className="flex items-center justify-between mb-3">
             <h4 className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider flex items-center gap-1.5">
             <Activity size={12} className="text-blue-500" /> 
             Data Distribution
             </h4>
             {useLogScale && (
-                <span className="text-[9px] font-mono text-blue-400 border border-blue-900/50 px-1.5 py-0.5 bg-blue-950/20">
+                <span className="text-[9px] font-mono text-blue-500 border border-blue-200 px-1.5 py-0.5 bg-blue-50 dark:text-blue-400 dark:border-blue-900/50 dark:bg-blue-950/20">
                     LOG SCALE
                 </span>
             )}
         </div>
         
-        <div className="font-mono text-xs bg-zinc-950/50 p-4 border border-zinc-800/80 relative">
-          <CornerAccents className="border-zinc-700" size="w-1 h-1" />
+        <div className="font-mono text-xs bg-zinc-50 dark:bg-zinc-950/50 p-4 border border-zinc-200 dark:border-zinc-800/80 relative transition-colors">
+          <CornerAccents className="border-zinc-300 dark:border-zinc-700" size="w-1 h-1" />
           
           <div className="space-y-1">
             {validPoints.map((p, idx) => {
               let ratio = 0;
-              
               if (useLogScale && p.value > 0) {
                  const logMin = Math.log10(minPositive);
                  const logMax = Math.log10(maxValue);
                  const logVal = Math.log10(p.value);
-                 // Normalize log value between 0 and 1
-                 // If max == min (single point or uniform), ratio is 1
                  const norm = logMax === logMin ? 1 : (logVal - logMin) / (logMax - logMin);
-                 // Apply a floor so minimum positive value has at least 1 block visibility relative to max
                  ratio = 0.1 + (0.9 * norm); 
               } else {
                  ratio = maxValue !== 0 ? p.value / maxValue : 0;
               }
-
-              // Ensure ratio stays within bounds [0, 1]
               ratio = Math.max(0, Math.min(1, ratio));
 
               const filledCount = Math.round(ratio * maxBarChars);
@@ -191,21 +180,18 @@ export const JsonDisplay = forwardRef<JsonDisplayRef, JsonDisplayProps>(({ data 
               const empty = '░'.repeat(Math.max(0, emptyCount));
 
               return (
-                <div key={idx} className="flex items-center gap-3 hover:bg-zinc-900 py-0.5 transition-colors group">
-                   {/* Axis Label */}
-                   <div className="w-24 text-right shrink-0 border-r border-zinc-800 pr-3 group-hover:border-zinc-700 transition-colors">
-                     <span className="text-zinc-400 truncate block" title={p.label}>{p.label}</span>
+                <div key={idx} className="flex items-center gap-3 hover:bg-zinc-100 dark:hover:bg-zinc-900 py-0.5 transition-colors group">
+                   <div className="w-24 text-right shrink-0 border-r border-zinc-200 dark:border-zinc-800 pr-3 group-hover:border-zinc-300 dark:group-hover:border-zinc-700 transition-colors">
+                     <span className="text-zinc-500 dark:text-zinc-400 truncate block" title={p.label}>{p.label}</span>
                    </div>
-                   
-                   {/* Bar Area */}
                    <div className="flex items-center gap-3">
                      <div className="relative" title={`${p.value} ${p.unit || ''}`}>
-                        <span className="text-blue-500 tracking-tighter select-none drop-shadow-[0_0_8px_rgba(59,130,246,0.3)]">{filled}</span>
-                        <span className="text-zinc-800 tracking-tighter select-none">{empty}</span>
+                        <span className="text-blue-600 dark:text-blue-500 tracking-tighter select-none drop-shadow-[0_0_8px_rgba(37,99,235,0.2)] dark:drop-shadow-[0_0_8px_rgba(59,130,246,0.3)]">{filled}</span>
+                        <span className="text-zinc-300 dark:text-zinc-800 tracking-tighter select-none">{empty}</span>
                      </div>
-                     <span className="text-zinc-300 font-bold tabular-nums">
+                     <span className="text-zinc-700 dark:text-zinc-300 font-bold tabular-nums">
                         {p.value}
-                        {p.unit && <span className="text-[10px] text-zinc-600 ml-1 font-normal">{p.unit}</span>}
+                        {p.unit && <span className="text-[10px] text-zinc-500 dark:text-zinc-600 ml-1 font-normal">{p.unit}</span>}
                      </span>
                    </div>
                 </div>
@@ -213,22 +199,17 @@ export const JsonDisplay = forwardRef<JsonDisplayRef, JsonDisplayProps>(({ data 
             })}
           </div>
 
-          {/* X-Axis Scale Indicators */}
-          <div className="flex items-center gap-3 mt-2 text-[9px] text-zinc-600 font-mono">
-            <div className="w-24 shrink-0 pr-3 text-right opacity-0">Labels</div> {/* Spacer */}
+          <div className="flex items-center gap-3 mt-2 text-[9px] text-zinc-500 dark:text-zinc-600 font-mono">
+            <div className="w-24 shrink-0 pr-3 text-right opacity-0">Labels</div>
             <div className="flex justify-between w-[20ch] tracking-tighter px-[1px]">
-               <span>
-                  {useLogScale ? minPositive.toExponential(0) : 0}
-               </span>
+               <span>{useLogScale ? minPositive.toExponential(0) : 0}</span>
                <span className="opacity-50">
                   {useLogScale 
                     ? Math.pow(10, (Math.log10(minPositive) + Math.log10(maxValue)) / 2).toExponential(0)
                     : Math.round(maxValue / 2)
                   }
                </span>
-               <span>
-                  {useLogScale ? maxValue.toExponential(0) : maxValue}
-               </span>
+               <span>{useLogScale ? maxValue.toExponential(0) : maxValue}</span>
             </div>
           </div>
         </div>
@@ -238,68 +219,42 @@ export const JsonDisplay = forwardRef<JsonDisplayRef, JsonDisplayProps>(({ data 
 
   const getPhaseIcon = (stageName: string) => {
     const lower = stageName.toLowerCase();
-    
-    // Synthesis / Materials / Preparation
-    if (lower.includes('syn') || lower.includes('prep') || lower.includes('fabric') || lower.includes('material') || lower.includes('grow')) {
-      return <FlaskConical size={18} />;
-    }
-    
-    // Characterization / Microscopy / Imaging
-    if (lower.includes('charac') || lower.includes('imag') || lower.includes('micro') || lower.includes('spec') || lower.includes('scan')) {
-      return <Microscope size={18} />;
-    }
-    
-    // Data Analysis / Statistics
-    if (lower.includes('analy') || lower.includes('data') || lower.includes('stat')) {
-      return <Activity size={18} />;
-    }
-    
-    // Simulation / Modeling / Theory / Computation
-    if (lower.includes('simul') || lower.includes('model') || lower.includes('theor') || lower.includes('comput')) {
-      return <Cpu size={18} />;
-    }
-    
-    // Experimental Setup / Design / Configuration
-    if (lower.includes('setup') || lower.includes('config') || lower.includes('design') || lower.includes('build')) {
-      return <Settings2 size={18} />;
-    }
-
-    // Measurements / Testing / Evaluation
-    if (lower.includes('measure') || lower.includes('test') || lower.includes('eval') || lower.includes('perf')) {
-      return <ScanEye size={18} />;
-    }
-
-    // Default Fallback
+    if (lower.includes('syn') || lower.includes('prep') || lower.includes('fabric') || lower.includes('material') || lower.includes('grow')) return <FlaskConical size={18} />;
+    if (lower.includes('charac') || lower.includes('imag') || lower.includes('micro') || lower.includes('spec') || lower.includes('scan')) return <Microscope size={18} />;
+    if (lower.includes('analy') || lower.includes('data') || lower.includes('stat')) return <Activity size={18} />;
+    if (lower.includes('simul') || lower.includes('model') || lower.includes('theor') || lower.includes('comput')) return <Cpu size={18} />;
+    if (lower.includes('setup') || lower.includes('config') || lower.includes('design') || lower.includes('build')) return <Settings2 size={18} />;
+    if (lower.includes('measure') || lower.includes('test') || lower.includes('eval') || lower.includes('perf')) return <ScanEye size={18} />;
     return <Layers size={18} />;
   };
 
   return (
-    <div className="space-y-8 font-sans text-zinc-300 tracking-wide">
-      <div className="border-b border-zinc-800 pb-4">
+    <div className="space-y-8 font-sans text-zinc-700 dark:text-zinc-300 tracking-wide transition-colors">
+      <div className="border-b border-zinc-200 dark:border-zinc-800 pb-4">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-            <h2 className="text-xl font-bold tracking-tight uppercase text-zinc-100">{data.paper_title}</h2>
+            <h2 className="text-xl font-bold tracking-tight uppercase text-zinc-900 dark:text-zinc-100">{data.paper_title}</h2>
             
             <div className="flex items-center gap-2 shrink-0">
               <button 
                 onClick={handleCopy}
                 className={`group relative flex items-center gap-2 text-xs font-medium transition-all border px-4 py-2 uppercase tracking-wide
                   ${copied 
-                    ? 'bg-emerald-950/30 text-emerald-400 border-emerald-900' 
-                    : 'bg-zinc-900 text-zinc-400 border-zinc-700 hover:text-blue-400 hover:border-blue-500/50 hover:bg-blue-950/20'
+                    ? 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-950/30 dark:text-emerald-400 dark:border-emerald-900' 
+                    : 'bg-white text-zinc-500 border-zinc-200 hover:text-blue-600 hover:border-blue-300 hover:bg-blue-50 dark:bg-zinc-900 dark:text-zinc-400 dark:border-zinc-700 dark:hover:text-blue-400 dark:hover:border-blue-500/50 dark:hover:bg-blue-950/20'
                   }`}
                 title="Copy JSON to clipboard"
               >
-                <CornerAccents className={copied ? "border-emerald-800" : "border-zinc-700 group-hover:border-blue-500/50"} size="w-1 h-1"/>
+                <CornerAccents className={copied ? "border-emerald-300 dark:border-emerald-800" : "border-zinc-300 dark:border-zinc-700 group-hover:border-blue-300 dark:group-hover:border-blue-500/50"} size="w-1 h-1"/>
                 {copied ? <Check size={14} className="text-emerald-500" /> : <Copy size={14} />}
                 {copied ? 'COPIED' : 'COPY JSON'}
               </button>
 
               <button 
                 onClick={handleDownload}
-                className="group relative flex items-center gap-2 text-xs font-medium transition-all border px-4 py-2 bg-zinc-900 text-zinc-400 border-zinc-700 hover:text-blue-400 hover:border-blue-500/50 hover:bg-blue-950/20 uppercase tracking-wide"
+                className="group relative flex items-center gap-2 text-xs font-medium transition-all border px-4 py-2 bg-white text-zinc-500 border-zinc-200 hover:text-blue-600 hover:border-blue-300 hover:bg-blue-50 dark:bg-zinc-900 dark:text-zinc-400 dark:border-zinc-700 dark:hover:text-blue-400 dark:hover:border-blue-500/50 dark:hover:bg-blue-950/20 uppercase tracking-wide"
                 title="Download Analysis Report (.md)"
               >
-                <CornerAccents className="border-zinc-700 group-hover:border-blue-500/50" size="w-1 h-1"/>
+                <CornerAccents className="border-zinc-300 dark:border-zinc-700 group-hover:border-blue-300 dark:group-hover:border-blue-500/50" size="w-1 h-1"/>
                 <Download size={14} />
                 EXPORT REPORT
               </button>
@@ -309,46 +264,44 @@ export const JsonDisplay = forwardRef<JsonDisplayRef, JsonDisplayProps>(({ data 
 
       <div className="flex items-center gap-2">
         <div className="w-1 h-4 bg-blue-600"></div>
-        <h1 className="text-lg font-bold text-zinc-500 uppercase tracking-widest">Analysis Result</h1>
+        <h1 className="text-lg font-bold text-zinc-500 dark:text-zinc-500 uppercase tracking-widest">Analysis Result</h1>
       </div>
 
       <section className="relative">
-        <h3 className="text-xs font-bold uppercase tracking-widest text-zinc-600 mb-2">Core Hypothesis Detail</h3>
-        <div className="bg-zinc-900/50 border-l-2 border-zinc-700 pl-4 py-2 text-zinc-200 leading-relaxed text-sm md:text-base">
+        <h3 className="text-xs font-bold uppercase tracking-widest text-zinc-500 dark:text-zinc-600 mb-2">Core Hypothesis Detail</h3>
+        <div className="bg-white dark:bg-zinc-900/50 border-l-2 border-zinc-300 dark:border-zinc-700 pl-4 py-2 text-zinc-800 dark:text-zinc-200 leading-relaxed text-sm md:text-base">
           {data.core_hypothesis}
         </div>
       </section>
 
       <section>
-        <h3 className="text-xs font-bold uppercase tracking-widest text-zinc-600 mb-4">Methodology</h3>
-        <p className="text-zinc-400 leading-relaxed mb-8 border-l-2 border-transparent pl-4">
+        <h3 className="text-xs font-bold uppercase tracking-widest text-zinc-500 dark:text-zinc-600 mb-4">Methodology</h3>
+        <p className="text-zinc-600 dark:text-zinc-400 leading-relaxed mb-8 border-l-2 border-transparent pl-4">
           {data.methodology_summary}
         </p>
         
         {data.methodology_steps && data.methodology_steps.length > 0 && (
           <div className="relative pl-2">
-            <div className="absolute top-0 bottom-0 left-[19px] w-px bg-zinc-800"></div>
+            <div className="absolute top-0 bottom-0 left-[19px] w-px bg-zinc-200 dark:bg-zinc-800"></div>
             
             <div className="space-y-8">
               {data.methodology_steps.map((stage, index) => (
                 <div key={index} className="relative flex gap-6 group">
-                  {/* Phase Icon - Square now */}
-                  <div className="flex-shrink-0 w-10 h-10 bg-zinc-900 border border-zinc-700 text-blue-500 flex items-center justify-center z-10 shadow-sm group-hover:border-blue-500/50 group-hover:text-blue-400 transition-all">
+                  <div className="flex-shrink-0 w-10 h-10 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 text-blue-600 dark:text-blue-500 flex items-center justify-center z-10 shadow-sm group-hover:border-blue-300 dark:group-hover:border-blue-500/50 group-hover:text-blue-500 dark:group-hover:text-blue-400 transition-all">
                     {getPhaseIcon(stage.stage_name)}
                   </div>
                   
-                  {/* Phase Content */}
                   <div className="flex-1 pt-1">
-                    <h4 className="text-sm font-bold text-zinc-200 mb-3 uppercase tracking-wide flex items-center gap-2">
-                      <span className="text-blue-500 font-mono text-xs">0{index + 1}</span>
+                    <h4 className="text-sm font-bold text-zinc-800 dark:text-zinc-200 mb-3 uppercase tracking-wide flex items-center gap-2">
+                      <span className="text-blue-600 dark:text-blue-500 font-mono text-xs">0{index + 1}</span>
                       {stage.stage_name}
                     </h4>
-                    <div className="relative bg-zinc-900/30 border border-zinc-800 p-5 hover:border-blue-900 transition-colors">
-                      <CornerAccents className="border-zinc-800 group-hover:border-blue-900" />
+                    <div className="relative bg-zinc-50 dark:bg-zinc-900/30 border border-zinc-200 dark:border-zinc-800 p-5 hover:border-blue-300 dark:hover:border-blue-900 transition-colors">
+                      <CornerAccents className="border-zinc-300 dark:border-zinc-800 group-hover:border-blue-300 dark:group-hover:border-blue-900" />
                       <ul className="space-y-2.5">
                         {stage.steps.map((step, sIdx) => (
-                          <li key={sIdx} className="text-sm text-zinc-400 leading-snug flex gap-3 items-start">
-                             <div className="w-1 h-1 bg-blue-500 mt-2 shrink-0"></div>
+                          <li key={sIdx} className="text-sm text-zinc-600 dark:text-zinc-400 leading-snug flex gap-3 items-start">
+                             <div className="w-1 h-1 bg-blue-600 dark:bg-blue-500 mt-2 shrink-0"></div>
                              <span>{step}</span>
                           </li>
                         ))}
@@ -363,16 +316,16 @@ export const JsonDisplay = forwardRef<JsonDisplayRef, JsonDisplayProps>(({ data 
       </section>
 
       <section>
-        <h3 className="text-xs font-bold uppercase tracking-widest text-zinc-600 mb-4">Key Results</h3>
-        <div className="border border-zinc-800 bg-zinc-900/30 p-6 relative">
-          <CornerAccents />
+        <h3 className="text-xs font-bold uppercase tracking-widest text-zinc-500 dark:text-zinc-600 mb-4">Key Results</h3>
+        <div className="border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/30 p-6 relative">
+          <CornerAccents className="border-zinc-300 dark:border-zinc-700" />
           <ul className="space-y-3">
             {data.key_results.map((result, idx) => (
               <li key={idx} className="flex gap-4">
-                <span className="flex-shrink-0 w-6 h-6 bg-blue-950/20 border border-blue-900 text-blue-400 flex items-center justify-center text-xs font-mono font-bold mt-0.5">
+                <span className="flex-shrink-0 w-6 h-6 bg-blue-50 border border-blue-200 text-blue-600 dark:bg-blue-950/20 dark:border-blue-900 dark:text-blue-400 flex items-center justify-center text-xs font-mono font-bold mt-0.5">
                   {idx + 1}
                 </span>
-                <span className="text-zinc-300 leading-relaxed">{result}</span>
+                <span className="text-zinc-700 dark:text-zinc-300 leading-relaxed">{result}</span>
               </li>
             ))}
           </ul>
@@ -380,71 +333,69 @@ export const JsonDisplay = forwardRef<JsonDisplayRef, JsonDisplayProps>(({ data 
       </section>
 
       <section className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="relative border border-zinc-800 bg-zinc-900/30 p-5">
-          <CornerAccents />
-          <h3 className="text-xs font-bold uppercase tracking-widest text-zinc-600 mb-3 flex items-center gap-2">
-            <span className="w-1 h-1 bg-zinc-600"></span> Conclusions
+        <div className="relative border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/30 p-5">
+          <CornerAccents className="border-zinc-300 dark:border-zinc-700" />
+          <h3 className="text-xs font-bold uppercase tracking-widest text-zinc-500 dark:text-zinc-600 mb-3 flex items-center gap-2">
+            <span className="w-1 h-1 bg-zinc-400 dark:bg-zinc-600"></span> Conclusions
           </h3>
-          <p className="text-zinc-300 text-sm leading-relaxed">{data.conclusions}</p>
+          <p className="text-zinc-700 dark:text-zinc-300 text-sm leading-relaxed">{data.conclusions}</p>
         </div>
-        <div className="relative border border-zinc-800 bg-zinc-900/30 p-5">
-           <CornerAccents />
-          <h3 className="text-xs font-bold uppercase tracking-widest text-zinc-600 mb-3 flex items-center gap-2">
-            <span className="w-1 h-1 bg-zinc-600"></span> Limitations
+        <div className="relative border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/30 p-5">
+           <CornerAccents className="border-zinc-300 dark:border-zinc-700" />
+          <h3 className="text-xs font-bold uppercase tracking-widest text-zinc-500 dark:text-zinc-600 mb-3 flex items-center gap-2">
+            <span className="w-1 h-1 bg-zinc-400 dark:bg-zinc-600"></span> Limitations
           </h3>
-          <p className="text-sm italic text-zinc-500 leading-relaxed">
+          <p className="text-sm italic text-zinc-500 dark:text-zinc-500 leading-relaxed">
             {data.limitations}
           </p>
         </div>
       </section>
 
       <section>
-        <h3 className="text-xs font-bold uppercase tracking-widest text-zinc-600 mb-4">Figures & Data Visualization</h3>
+        <h3 className="text-xs font-bold uppercase tracking-widest text-zinc-500 dark:text-zinc-600 mb-4">Figures & Data Visualization</h3>
         <div className="grid grid-cols-1 gap-6">
           {(data.figures_data as any[]).map((fig: FigureData | string, idx: number) => {
              if (typeof fig === 'string') {
                  return (
-                    <div key={idx} className="border border-zinc-800 p-3 text-sm text-zinc-500 font-mono">
+                    <div key={idx} className="border border-zinc-200 dark:border-zinc-800 p-3 text-sm text-zinc-500 font-mono">
                         {fig}
                     </div>
                  )
              }
              
-             const hasDataPoints = fig.data_points && fig.data_points.length > 0;
              const typeLower = fig.type?.toLowerCase() || '';
-             
              const isMicrograph = typeLower.includes('micrograph') || typeLower.includes('microscop') || typeLower.includes('tem') || typeLower.includes('sem') || typeLower.includes('afm');
-             const isChart = typeLower.includes('chart') || typeLower.includes('plot') || typeLower.includes('graph') || typeLower.includes('spectrum') || typeLower.includes('spectra') || typeLower.includes('histogram') || hasDataPoints;
+             const isChart = typeLower.includes('chart') || typeLower.includes('plot') || typeLower.includes('graph') || typeLower.includes('spectrum') || typeLower.includes('spectra') || typeLower.includes('histogram') || (fig.data_points && fig.data_points.length > 0);
              const isDiagram = typeLower.includes('diagram') || typeLower.includes('schematic') || typeLower.includes('illustration') || typeLower.includes('mechanism') || typeLower.includes('model') || typeLower.includes('flow');
 
              let IconComponent = ImageIcon;
-             let iconStyles = "bg-rose-950/20 text-rose-400 border-rose-900/50";
-             let badgeStyles = "text-rose-400 border-rose-900/50 bg-rose-950/20";
+             let iconStyles = "bg-rose-50 text-rose-600 border-rose-200 dark:bg-rose-950/20 dark:text-rose-400 dark:border-rose-900/50";
+             let badgeStyles = "text-rose-600 border-rose-200 bg-rose-50 dark:text-rose-400 dark:border-rose-900/50 dark:bg-rose-950/20";
              
              if (isMicrograph) {
                  IconComponent = Microscope;
-                 iconStyles = "bg-emerald-950/20 text-emerald-400 border-emerald-900/50";
-                 badgeStyles = "text-emerald-400 border-emerald-900/50 bg-emerald-950/20";
+                 iconStyles = "bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-950/20 dark:text-emerald-400 dark:border-emerald-900/50";
+                 badgeStyles = "text-emerald-600 border-emerald-200 bg-emerald-50 dark:text-emerald-400 dark:border-emerald-900/50 dark:bg-emerald-950/20";
              } else if (isChart) {
                  IconComponent = BarChart3;
-                 iconStyles = "bg-blue-950/20 text-blue-400 border-blue-900/50";
-                 badgeStyles = "text-blue-400 border-blue-900/50 bg-blue-950/20";
+                 iconStyles = "bg-blue-50 text-blue-600 border-blue-200 dark:bg-blue-950/20 dark:text-blue-400 dark:border-blue-900/50";
+                 badgeStyles = "text-blue-600 border-blue-200 bg-blue-50 dark:text-blue-400 dark:border-blue-900/50 dark:bg-blue-950/20";
              } else if (isDiagram) {
                  IconComponent = Workflow;
-                 iconStyles = "bg-orange-950/20 text-orange-400 border-orange-900/50";
-                 badgeStyles = "text-orange-400 border-orange-900/50 bg-orange-950/20";
+                 iconStyles = "bg-orange-50 text-orange-600 border-orange-200 dark:bg-orange-950/20 dark:text-orange-400 dark:border-orange-900/50";
+                 badgeStyles = "text-orange-600 border-orange-200 bg-orange-50 dark:text-orange-400 dark:border-orange-900/50 dark:bg-orange-950/20";
              }
 
              return (
-                <div key={idx} className="group relative bg-zinc-900/30 border border-zinc-800 p-6 transition-all duration-200 hover:border-zinc-600">
-                    <CornerAccents className="border-zinc-800 group-hover:border-zinc-600" />
+                <div key={idx} className="group relative bg-white dark:bg-zinc-900/30 border border-zinc-200 dark:border-zinc-800 p-6 transition-all duration-200 hover:border-zinc-400 dark:hover:border-zinc-600">
+                    <CornerAccents className="border-zinc-300 dark:border-zinc-800 group-hover:border-zinc-400 dark:group-hover:border-zinc-600" />
                     <div className="flex flex-col sm:flex-row justify-between items-start gap-4 mb-6">
                         <div className="flex items-start gap-4">
                            <div className={`p-2.5 shrink-0 border ${iconStyles}`}>
                              <IconComponent size={20} />
                            </div>
                            <div className="space-y-1">
-                              <h4 className="font-semibold text-zinc-200 text-base leading-tight font-mono uppercase">
+                              <h4 className="font-semibold text-zinc-900 dark:text-zinc-200 text-base leading-tight font-mono uppercase">
                                 {fig.caption || `Figure ${idx + 1}`}
                               </h4>
                               <p className="text-xs text-zinc-500 font-normal leading-normal uppercase tracking-wide">
@@ -460,20 +411,20 @@ export const JsonDisplay = forwardRef<JsonDisplayRef, JsonDisplayProps>(({ data 
                     <div className="pl-0 sm:pl-14">
                       <div className="mb-4">
                          <div className="flex items-center gap-2 mb-2">
-                            <ScanEye size={14} className="text-zinc-600" />
-                            <span className="text-[10px] font-bold uppercase text-zinc-600 tracking-widest">Findings</span>
+                            <ScanEye size={14} className="text-zinc-500 dark:text-zinc-600" />
+                            <span className="text-[10px] font-bold uppercase text-zinc-500 dark:text-zinc-600 tracking-widest">Findings</span>
                          </div>
                          {Array.isArray(fig.findings) ? (
                             <ul className="space-y-1.5">
                               {fig.findings.map((finding: string, fIdx: number) => (
-                                <li key={fIdx} className="text-sm text-zinc-400 flex gap-2 items-start">
-                                  <ArrowRight size={14} className="mt-1 text-zinc-700 shrink-0" />
+                                <li key={fIdx} className="text-sm text-zinc-600 dark:text-zinc-400 flex gap-2 items-start">
+                                  <ArrowRight size={14} className="mt-1 text-zinc-400 dark:text-zinc-700 shrink-0" />
                                   <span>{finding}</span>
                                 </li>
                               ))}
                             </ul>
                          ) : (
-                            <p className="text-sm text-zinc-400 leading-relaxed">{(fig as any).observation || (fig as any).findings}</p>
+                            <p className="text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed">{(fig as any).observation || (fig as any).findings}</p>
                          )}
                       </div>
                       
@@ -487,48 +438,48 @@ export const JsonDisplay = forwardRef<JsonDisplayRef, JsonDisplayProps>(({ data 
 
       <section className="relative mt-2 mb-6">
         <div className="flex items-center justify-between mb-2">
-            <h3 className="text-xs font-bold uppercase tracking-widest text-zinc-600 flex items-center gap-2">
+            <h3 className="text-xs font-bold uppercase tracking-widest text-zinc-500 dark:text-zinc-600 flex items-center gap-2">
                 <FileText size={14} /> Executive Summary
             </h3>
             <button 
                 onClick={handleCopySummary}
-                className="group flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-zinc-600 hover:text-blue-400 transition-colors"
+                className="group flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-zinc-500 hover:text-blue-600 dark:text-zinc-600 dark:hover:text-blue-400 transition-colors"
                 title="Copy Summary"
             >
                 {summaryCopied ? <Check size={12} className="text-emerald-500" /> : <Copy size={12} />}
                 <span className={summaryCopied ? "text-emerald-500" : ""}>{summaryCopied ? "COPIED" : "COPY"}</span>
             </button>
         </div>
-        <div className="bg-zinc-900/30 border border-zinc-800 p-5 text-zinc-300 text-sm leading-relaxed relative hover:border-zinc-700 transition-colors">
-            <CornerAccents className="border-zinc-700" />
+        <div className="bg-white dark:bg-zinc-900/30 border border-zinc-200 dark:border-zinc-800 p-5 text-zinc-700 dark:text-zinc-300 text-sm leading-relaxed relative hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors">
+            <CornerAccents className="border-zinc-300 dark:border-zinc-700" />
             <p>
-                <span className="text-blue-400 font-bold uppercase text-[10px] tracking-wider mr-2">Hypothesis</span> 
+                <span className="text-blue-600 dark:text-blue-400 font-bold uppercase text-[10px] tracking-wider mr-2">Hypothesis</span> 
                 {data.core_hypothesis}
             </p>
             <p className="mt-3">
-                <span className="text-blue-400 font-bold uppercase text-[10px] tracking-wider mr-2">Key Findings</span> 
+                <span className="text-blue-600 dark:text-blue-400 font-bold uppercase text-[10px] tracking-wider mr-2">Key Findings</span> 
                 {data.key_results.join('; ')}
             </p>
             <p className="mt-3">
-                <span className="text-blue-400 font-bold uppercase text-[10px] tracking-wider mr-2">Conclusion</span> 
+                <span className="text-blue-600 dark:text-blue-400 font-bold uppercase text-[10px] tracking-wider mr-2">Conclusion</span> 
                 {data.conclusions}
             </p>
         </div>
       </section>
 
-      <div className="mt-8 pt-6 border-t border-zinc-800">
+      <div className="mt-8 pt-6 border-t border-zinc-200 dark:border-zinc-800">
         <div className="flex items-center justify-between mb-3">
-          <h3 className="text-xs font-bold uppercase tracking-widest text-zinc-600">Raw Data Stream</h3>
+          <h3 className="text-xs font-bold uppercase tracking-widest text-zinc-500 dark:text-zinc-600">Raw Data Stream</h3>
           <button 
             onClick={handleCopyRaw}
-            className="group flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-zinc-600 hover:text-blue-400 transition-colors"
+            className="group flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-zinc-500 hover:text-blue-600 dark:text-zinc-600 dark:hover:text-blue-400 transition-colors"
             title="Copy Raw Data"
           >
             {rawCopied ? <Check size={12} className="text-emerald-500" /> : <Copy size={12} />}
             <span className={rawCopied ? "text-emerald-500" : ""}>{rawCopied ? "COPIED" : "COPY"}</span>
           </button>
         </div>
-        <pre className="bg-black/50 border border-zinc-800 text-zinc-500 p-4 overflow-x-auto text-[10px] font-mono leading-tight">
+        <pre className="bg-zinc-100 dark:bg-black/50 border border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-500 p-4 overflow-x-auto text-[10px] font-mono leading-tight">
           {JSON.stringify(data, null, 2)}
         </pre>
       </div>

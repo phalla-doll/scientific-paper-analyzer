@@ -25,14 +25,45 @@ const App: React.FC = () => {
   const [stickyCopied, setStickyCopied] = useState(false);
   const [errorDetail, setErrorDetail] = useState<any>(null);
   
+  // Theme State
+  const [isDarkMode, setIsDarkMode] = useState<boolean>(true);
+  
   const fileInputRef = useRef<HTMLInputElement>(null);
   const chatEndRef = useRef<HTMLDivElement>(null);
   const jsonDisplayRef = useRef<JsonDisplayRef>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   
-  // Ref to track the current analysis session ID. 
-  // If the user cancels, we increment this to ignore results from the stale promise.
   const analysisIdRef = useRef<number>(0);
+
+  // Initialize theme from local storage
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('theme');
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    
+    if (savedTheme === 'light') {
+      setIsDarkMode(false);
+    } else if (savedTheme === 'dark') {
+      setIsDarkMode(true);
+    } else {
+      setIsDarkMode(prefersDark);
+    }
+  }, []);
+
+  // Apply theme class to html element
+  useEffect(() => {
+    if (isDarkMode) {
+      document.documentElement.classList.add('dark');
+      localStorage.setItem('theme', 'dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+      localStorage.setItem('theme', 'light');
+    }
+  }, [isDarkMode]);
+
+  const toggleTheme = () => {
+    setIsDarkMode(prev => !prev);
+    trackEvent('theme_toggled', { mode: !isDarkMode ? 'dark' : 'light' });
+  };
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -40,7 +71,6 @@ const App: React.FC = () => {
 
   const handleScroll = () => {
     if (scrollContainerRef.current) {
-        // Threshold: 200px. If scrolled past, show sticky actions.
         const shouldShow = scrollContainerRef.current.scrollTop > 200;
         if (shouldShow !== showStickyActions) {
             setShowStickyActions(shouldShow);
@@ -60,7 +90,6 @@ const App: React.FC = () => {
   const handleInputSubmit = async () => {
     if (!inputText.trim()) return;
 
-    // Mode 1: Interactive Chat (Post-Analysis)
     if (analysis && appState === AppState.COMPLETE) {
       const userQuery = inputText;
       setInputText('');
@@ -81,7 +110,6 @@ const App: React.FC = () => {
       return;
     }
 
-    // Mode 2: Raw Text Analysis (Pre-Analysis)
     handleTextAnalyze();
   };
 
@@ -107,8 +135,6 @@ const App: React.FC = () => {
 
     try {
       const result = await analyzePaper({ text: textToAnalyze });
-      
-      // Guard: Check if this process is still active (not cancelled/superseded)
       if (analysisIdRef.current !== currentId) return;
 
       setAnalysis(result);
@@ -136,8 +162,6 @@ const App: React.FC = () => {
 
       setSelectedFiles(prev => [...prev, ...newFiles]);
       trackEvent('files_selected', { count: newFiles.length });
-      
-      // Reset input so duplicate selection is possible if needed
       if (fileInputRef.current) fileInputRef.current.value = '';
     }
   };
@@ -161,9 +185,7 @@ const App: React.FC = () => {
     trackEvent('batch_analysis_started', { file_count: selectedFiles.length });
 
     try {
-      // Convert all PDFs to images in parallel
       const allImagesArrays = await Promise.all(selectedFiles.map(f => convertPdfToImages(f)));
-      
       if (analysisIdRef.current !== currentId) return;
 
       const images = allImagesArrays.flat();
@@ -172,14 +194,12 @@ const App: React.FC = () => {
       addMessage('assistant', `Derendering documents (${images.length} total pages) and interpreting visuals...`);
       
       const result = await analyzePaper({ images });
-      
       if (analysisIdRef.current !== currentId) return;
       
       setAnalysis(result);
       setAppState(AppState.COMPLETE);
       addMessage('assistant', 'Analysis complete. Structured data extracted.');
       addMessage('assistant', 'System is ready for Q&A. Type below to query the documents.');
-      
       trackEvent('analyze_pdf_completed', { page_count: images.length, paper_title: result.paper_title });
 
     } catch (error: any) {
@@ -193,9 +213,7 @@ const App: React.FC = () => {
   };
 
   const handleCancelAnalysis = () => {
-    // Invalidate the current analysis ID
     analysisIdRef.current = 0;
-    
     setAppState(AppState.IDLE);
     setAnalysis(null);
     setErrorDetail(null);
@@ -236,7 +254,7 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="flex h-screen w-full bg-[#09090b] text-zinc-200 overflow-hidden font-sans tracking-wide selection:bg-blue-500/30">
+    <div className="flex h-screen w-full bg-zinc-50 dark:bg-[#09090b] text-zinc-800 dark:text-zinc-200 overflow-hidden font-sans tracking-wide selection:bg-blue-500/30 transition-colors duration-300">
       
       <LeftPanel 
         appState={appState}
@@ -253,6 +271,8 @@ const App: React.FC = () => {
         handleReset={handleReset}
         fileInputRef={fileInputRef}
         chatEndRef={chatEndRef}
+        isDarkMode={isDarkMode}
+        toggleTheme={toggleTheme}
       />
 
       <RightPanel 
@@ -261,7 +281,6 @@ const App: React.FC = () => {
         errorDetail={errorDetail}
         onReset={() => {
             handleReset();
-            // Add specific error reset message if needed
              setMessages(prev => [...prev, {
                 id: Date.now().toString(),
                 role: 'system',
