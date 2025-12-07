@@ -159,7 +159,7 @@ export const LeftPanel: React.FC<LeftPanelProps> = ({
             <a 
               href="/assets/sample-research-paper.pdf" 
               download 
-              className="text-[10px] text-zinc-400 hover:text-blue-500 dark:text-zinc-600 dark:hover:text-blue-400 flex items-center gap-1.5 transition-colors uppercase tracking-wider font-mono cursor-pointer border-b border-dashed border-transparent hover:border-blue-500 dark:hover:border-blue-400 pb-0.5"
+              className="text-[10px] text-zinc-400 hover:text-blue-600 dark:text-zinc-500 dark:hover:text-blue-500 flex items-center gap-1.5 transition-colors uppercase tracking-wider font-mono cursor-pointer pb-0.5"
             >
               <Download size={10} />
               Download Sample PDF
