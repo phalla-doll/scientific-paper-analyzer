@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { PaperAnalysis, FigureData, DataPoint, MethodologyStage } from '../types';
 import { 
-  Copy, Check, LineChart, ImageIcon, ScanEye, ArrowRight, Microscope, Activity, 
+  Copy, Check, BarChart3, ImageIcon, ScanEye, ArrowRight, Microscope, Activity, 
   FlaskConical, Binary, Layers, PenTool, Beaker, Download, Workflow, Settings2, Cpu
 } from 'lucide-react';
 
@@ -21,12 +21,23 @@ const CornerAccents = ({ color = "border-zinc-700", size = "w-1.5 h-1.5" }) => (
 
 export const JsonDisplay: React.FC<JsonDisplayProps> = ({ data }) => {
   const [copied, setCopied] = useState(false);
+  const [rawCopied, setRawCopied] = useState(false);
 
   const handleCopy = async () => {
     try {
       await navigator.clipboard.writeText(JSON.stringify(data, null, 2));
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy text: ', err);
+    }
+  };
+
+  const handleCopyRaw = async () => {
+    try {
+      await navigator.clipboard.writeText(JSON.stringify(data, null, 2));
+      setRawCopied(true);
+      setTimeout(() => setRawCopied(false), 2000);
     } catch (err) {
       console.error('Failed to copy text: ', err);
     }
@@ -344,15 +355,15 @@ export const JsonDisplay: React.FC<JsonDisplayProps> = ({ data }) => {
              const isDiagram = typeLower.includes('diagram') || typeLower.includes('schematic') || typeLower.includes('illustration') || typeLower.includes('mechanism') || typeLower.includes('model') || typeLower.includes('flow');
 
              let IconComponent = ImageIcon;
-             let iconStyles = "bg-purple-950/20 text-purple-400 border-purple-900/50";
-             let badgeStyles = "text-purple-400 border-purple-900/50 bg-purple-950/20";
+             let iconStyles = "bg-rose-950/20 text-rose-400 border-rose-900/50";
+             let badgeStyles = "text-rose-400 border-rose-900/50 bg-rose-950/20";
              
              if (isMicrograph) {
                  IconComponent = Microscope;
                  iconStyles = "bg-emerald-950/20 text-emerald-400 border-emerald-900/50";
                  badgeStyles = "text-emerald-400 border-emerald-900/50 bg-emerald-950/20";
              } else if (isChart) {
-                 IconComponent = LineChart;
+                 IconComponent = BarChart3;
                  iconStyles = "bg-blue-950/20 text-blue-400 border-blue-900/50";
                  badgeStyles = "text-blue-400 border-blue-900/50 bg-blue-950/20";
              } else if (isDiagram) {
@@ -412,7 +423,17 @@ export const JsonDisplay: React.FC<JsonDisplayProps> = ({ data }) => {
       </section>
 
       <div className="mt-8 pt-6 border-t border-zinc-800">
-        <h3 className="text-xs font-bold uppercase tracking-widest text-zinc-600 mb-3">Raw Data Stream</h3>
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="text-xs font-bold uppercase tracking-widest text-zinc-600">Raw Data Stream</h3>
+          <button 
+            onClick={handleCopyRaw}
+            className="group flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-zinc-600 hover:text-blue-400 transition-colors"
+            title="Copy Raw Data"
+          >
+            {rawCopied ? <Check size={12} className="text-emerald-500" /> : <Copy size={12} />}
+            <span className={rawCopied ? "text-emerald-500" : ""}>{rawCopied ? "COPIED" : "COPY"}</span>
+          </button>
+        </div>
         <pre className="bg-black/50 border border-zinc-800 text-zinc-500 p-4 overflow-x-auto text-[10px] font-mono leading-tight">
           {JSON.stringify(data, null, 2)}
         </pre>
