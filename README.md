@@ -15,6 +15,7 @@ A "world-class" multimodal research assistant designed to analyze academic paper
 -   **Data Visualization**:
     -   **Methodology Timeline**: Graphical representation of experimental phases (Synthesis, Characterization, Analysis, etc.) with context-aware icons.
     -   **Figure Interpretation**: Detects figure types (Charts, Micrographs, Diagrams) and generates text-based ASCII charts for extracted numerical data.
+-   **Fault Tolerance**: Integrated React Error Boundaries wrap critical components (Visualization Engine, Chat Log) to ensure graceful failure handling. If a module crashes, users can reset it without losing the entire application state.
 -   **Export**: Download the full analysis as a formatted Markdown (`.md`) report.
 -   **Futuristic HUD Aesthetic**: Designed with a technical, 0-radius "Head-Up Display" visual style featuring corner accents, monospaced typography, and precise grid layouts.
 
@@ -70,7 +71,8 @@ You need a Google Gemini API Key to run the analysis.
 ```
 ├── components/
 │   ├── Button.tsx         # Reusable button component
-│   └── JsonDisplay.tsx    # Main visualization component for analysis results
+│   ├── JsonDisplay.tsx    # Main visualization component for analysis results
+│   └── ErrorBoundary.tsx  # React Error Boundary for graceful crash handling
 ├── services/
 │   └── geminiService.ts   # Google GenAI interaction logic & prompts
 ├── utils/

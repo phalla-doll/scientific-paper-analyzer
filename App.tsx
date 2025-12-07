@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Upload, Bot, AlertCircle, CheckCircle2, Sparkles, Send, RefreshCw, MessageSquare } from 'lucide-react';
 import { JsonDisplay } from './components/JsonDisplay';
+import { ErrorBoundary } from './components/ErrorBoundary';
 import { convertPdfToImages } from './utils/pdfUtils';
 import { analyzePaper, chatWithPaper } from './services/geminiService';
 import { Message, PaperAnalysis, AppState } from './types';
@@ -272,40 +273,42 @@ const App: React.FC = () => {
         </div>
 
         {/* Chat Area */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-6 bg-dots-pattern">
-          {messages.map((msg) => (
-            <div key={msg.id} className={`flex flex-col ${msg.role === 'user' ? 'items-end' : 'items-start'} animate-in fade-in slide-in-from-bottom-2`}>
-              <div className={`
-                relative max-w-[90%] px-5 py-4 text-sm leading-relaxed border backdrop-blur-sm
-                ${msg.role === 'user' 
-                  ? 'bg-gray-50 text-gray-800 border-gray-200 shadow-sm' 
-                  : msg.role === 'assistant'
-                    ? 'bg-blue-50/40 text-blue-900 border-blue-100'
-                    : 'text-gray-400 text-xs font-mono uppercase tracking-wider border-transparent pl-0'
-                }
-              `}>
-                {msg.role !== 'system' && (
-                    <CornerAccents className={msg.role === 'user' ? 'border-gray-300' : 'border-blue-200'} size="w-1 h-1"/>
-                )}
-                {msg.role === 'assistant' && (
-                  <span className="flex items-center gap-2 mb-2 font-bold text-blue-600 text-[10px] uppercase tracking-widest">
-                    <Bot size={10} /> AI Analysis
-                  </span>
-                )}
-                {msg.content}
-              </div>
-            </div>
-          ))}
-          {isChatting && (
-            <div className="flex flex-col items-start animate-pulse">
-                <div className="relative max-w-[90%] px-5 py-4 text-sm bg-blue-50/20 border border-blue-100 text-blue-400">
-                    <CornerAccents className="border-blue-200" size="w-1 h-1"/>
-                    Thinking...
+        <ErrorBoundary componentName="CHAT_LOG">
+          <div className="flex-1 overflow-y-auto p-6 space-y-6 bg-dots-pattern">
+            {messages.map((msg) => (
+              <div key={msg.id} className={`flex flex-col ${msg.role === 'user' ? 'items-end' : 'items-start'} animate-in fade-in slide-in-from-bottom-2`}>
+                <div className={`
+                  relative max-w-[90%] px-5 py-4 text-sm leading-relaxed border backdrop-blur-sm
+                  ${msg.role === 'user' 
+                    ? 'bg-gray-50 text-gray-800 border-gray-200 shadow-sm' 
+                    : msg.role === 'assistant'
+                      ? 'bg-blue-50/40 text-blue-900 border-blue-100'
+                      : 'text-gray-400 text-xs font-mono uppercase tracking-wider border-transparent pl-0'
+                  }
+                `}>
+                  {msg.role !== 'system' && (
+                      <CornerAccents className={msg.role === 'user' ? 'border-gray-300' : 'border-blue-200'} size="w-1 h-1"/>
+                  )}
+                  {msg.role === 'assistant' && (
+                    <span className="flex items-center gap-2 mb-2 font-bold text-blue-600 text-[10px] uppercase tracking-widest">
+                      <Bot size={10} /> AI Analysis
+                    </span>
+                  )}
+                  {msg.content}
                 </div>
-            </div>
-          )}
-          <div ref={chatEndRef} />
-        </div>
+              </div>
+            ))}
+            {isChatting && (
+              <div className="flex flex-col items-start animate-pulse">
+                  <div className="relative max-w-[90%] px-5 py-4 text-sm bg-blue-50/20 border border-blue-100 text-blue-400">
+                      <CornerAccents className="border-blue-200" size="w-1 h-1"/>
+                      Thinking...
+                  </div>
+              </div>
+            )}
+            <div ref={chatEndRef} />
+          </div>
+        </ErrorBoundary>
 
         {/* Footer Input Area */}
         <div className="p-6 border-t border-gray-100 bg-white space-y-5 relative z-20">
@@ -418,7 +421,22 @@ const App: React.FC = () => {
 
             <div className="space-y-6 pb-20 animate-in fade-in slide-in-from-bottom-4 duration-700">
               {analysis ? (
-                  <JsonDisplay data={analysis} />
+                  <ErrorBoundary 
+                    componentName="DATA_VISUALIZER" 
+                    onReset={() => {
+                        setAnalysis(null);
+                        setAppState(AppState.IDLE);
+                        setCurrentFile(null);
+                        setMessages(prev => [...prev, {
+                            id: Date.now().toString(),
+                            role: 'system',
+                            content: 'System reset due to visualization error.',
+                            timestamp: Date.now()
+                        }]);
+                    }}
+                  >
+                      <JsonDisplay data={analysis} />
+                  </ErrorBoundary>
               ) : (
                   <div className="h-[400px] flex flex-col items-center justify-center border border-gray-200 bg-white relative">
                       <CornerAccents />
