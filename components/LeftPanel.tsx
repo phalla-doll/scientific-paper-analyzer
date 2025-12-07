@@ -166,7 +166,7 @@ export const LeftPanel: React.FC<LeftPanelProps> = ({
         )}
         
         {/* Technical Footer */}
-        <div className="mt-4 pt-4 border-t border-dashed border-zinc-200 dark:border-zinc-800 flex justify-between items-baseline text-[10px] text-zinc-400 dark:text-zinc-600 font-mono tracking-widest uppercase">
+        <div className="mt-4 pt-4 border-t border-dashed border-zinc-200 dark:border-zinc-800 flex justify-between items-center text-[10px] text-zinc-400 dark:text-zinc-600 font-mono tracking-widest uppercase">
           <div className="flex items-center gap-1">
              <Cpu size={10} />
              <span>System v3.0.4</span>
