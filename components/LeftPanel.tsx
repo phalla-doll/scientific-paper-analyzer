@@ -1,5 +1,5 @@
 import React from 'react';
-import { Bot, RefreshCw, MessageSquare, Send, FileText, X, Upload, Plus, Square, Play, Download, Sun, Moon, Cpu, Heart, ArrowRight } from 'lucide-react';
+import { Bot, RefreshCw, MessageSquare, Send, FileText, X, Upload, Plus, Square, Play, Download, Sun, Moon, Cpu, ArrowRight } from 'lucide-react';
 import { ErrorBoundary } from './ErrorBoundary';
 import { CornerAccents } from './CornerAccents';
 import { AppState, Message } from '../types';
@@ -102,21 +102,23 @@ export const LeftPanel: React.FC<LeftPanelProps> = ({
                 {msg.role === 'assistant' ? <Bot size={16} /> : msg.role === 'user' ? <MessageSquare size={16} /> : <Bot size={16} className="opacity-50" />}
                 </div>
                 
-                <div className={`flex-1 max-w-[85%] text-sm leading-relaxed border relative
-                ${msg.role === 'user' 
-                    ? 'bg-zinc-100 border-zinc-200 text-zinc-800 dark:bg-zinc-800/50 dark:border-zinc-700 dark:text-zinc-200 p-3' 
-                    : msg.role === 'assistant'
-                    ? 'bg-blue-50 border-blue-100 text-zinc-800 dark:bg-blue-950/20 dark:border-blue-900/50 dark:text-blue-100 p-3'
-                    : 'bg-transparent border-transparent text-zinc-500 font-mono text-xs py-2.5 px-3'
-                }`}
-                >
-                {msg.role !== 'system' && (
-                    <CornerAccents 
-                        className={msg.role === 'assistant' ? 'border-blue-200 dark:border-blue-800' : 'border-zinc-300 dark:border-zinc-600'} 
-                        size="w-1 h-1" 
-                    />
-                )}
-                {msg.content}
+                <div className={`flex items-start ${msg.role === 'system' ? 'py-2.5' : ''}`}>
+                  <div className={`flex-1 max-w-[85%] text-sm leading-relaxed border relative
+                  ${msg.role === 'user' 
+                      ? 'bg-zinc-100 border-zinc-200 text-zinc-800 dark:bg-zinc-800/50 dark:border-zinc-700 dark:text-zinc-200 p-3' 
+                      : msg.role === 'assistant'
+                      ? 'bg-blue-50 border-blue-100 text-zinc-800 dark:bg-blue-950/20 dark:border-blue-900/50 dark:text-blue-100 p-3'
+                      : 'bg-transparent border-transparent text-zinc-500 font-mono text-xs px-3'
+                  }`}
+                  >
+                  {msg.role !== 'system' && (
+                      <CornerAccents 
+                          className={msg.role === 'assistant' ? 'border-blue-200 dark:border-blue-800' : 'border-zinc-300 dark:border-zinc-600'} 
+                          size="w-1 h-1" 
+                      />
+                  )}
+                  {msg.content}
+                  </div>
                 </div>
             </div>
             ))}
@@ -172,8 +174,15 @@ export const LeftPanel: React.FC<LeftPanelProps> = ({
              <span>System v3.0.4</span>
           </div>
           <div className="flex items-center gap-1">
-            <span>Made with Gemini-3 by mantha</span>
-            <Heart size={8} className="text-red-500 fill-red-500/50" />
+            <span>Made with Gemini-3 by </span>
+            <a 
+              href="https://mantha.vercel.app/?utm_source=scientific-paper-analyzer" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-zinc-500 dark:text-zinc-400 border-b border-dashed border-zinc-400 dark:border-zinc-500 hover:text-blue-600 dark:hover:text-blue-400 hover:border-blue-600 dark:hover:border-blue-400 transition-colors pb-0.5"
+            >
+              mantha
+            </a>
           </div>
         </div>
       </div>
