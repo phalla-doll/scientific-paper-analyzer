@@ -100,8 +100,8 @@ export const JsonDisplay = forwardRef<JsonDisplayRef, JsonDisplayProps>(({ data 
                 const maxLabelWidth = Math.max(...fig.data_points.map((p: any) => p.label.length), 10);
                 mdContent += "```text\n";
                 fig.data_points.forEach((dp: any) => {
-                    const barLen = Math.floor((dp.value / maxVal) * 20);
-                    const bar = '█'.repeat(barLen).padEnd(20, '░');
+                    const barLen = Math.floor((dp.value / maxVal) * 30);
+                    const bar = '█'.repeat(barLen).padEnd(30, '░');
                     mdContent += `${dp.label.padEnd(maxLabelWidth)} | ${bar} ${dp.value}${dp.unit ? ' ' + dp.unit : ''}\n`;
                 });
                 mdContent += "```\n";
@@ -141,7 +141,8 @@ export const JsonDisplay = forwardRef<JsonDisplayRef, JsonDisplayProps>(({ data 
     const rangeRatio = minPositive > 0 ? maxValue / minPositive : 0;
     const useLogScale = minValue >= 0 && rangeRatio > 1000;
     
-    const maxBarChars = 24;
+    // Increased character resolution for better detail
+    const maxBarChars = 32;
     
     return (
       <div className="mt-5 pt-4 border-t border-dashed border-zinc-200 dark:border-zinc-800/50">
@@ -180,15 +181,20 @@ export const JsonDisplay = forwardRef<JsonDisplayRef, JsonDisplayProps>(({ data 
               const empty = '░'.repeat(Math.max(0, emptyCount));
 
               return (
-                <div key={idx} className="flex items-center gap-3 hover:bg-zinc-100 dark:hover:bg-zinc-900 py-0.5 transition-colors group">
-                   <div className="w-24 text-right shrink-0 border-r border-zinc-200 dark:border-zinc-800 pr-3 group-hover:border-zinc-300 dark:group-hover:border-zinc-700 transition-colors">
+                <div key={idx} className="grid grid-cols-[120px_1fr_auto] gap-4 hover:bg-zinc-100 dark:hover:bg-zinc-900 py-0.5 transition-colors group items-center">
+                   {/* Label Column */}
+                   <div className="text-right border-r border-zinc-200 dark:border-zinc-800 pr-3 group-hover:border-zinc-300 dark:group-hover:border-zinc-700 transition-colors">
                      <span className="text-zinc-500 dark:text-zinc-400 truncate block" title={p.label}>{p.label}</span>
                    </div>
-                   <div className="flex items-center gap-3">
-                     <div className="relative" title={`${p.value} ${p.unit || ''}`}>
-                        <span className="text-blue-600 dark:text-blue-500 tracking-tighter select-none drop-shadow-[0_0_8px_rgba(37,99,235,0.2)] dark:drop-shadow-[0_0_8px_rgba(59,130,246,0.3)]">{filled}</span>
-                        <span className="text-zinc-300 dark:text-zinc-800 tracking-tighter select-none">{empty}</span>
-                     </div>
+                   
+                   {/* Bar Column */}
+                   <div className="relative flex items-center whitespace-nowrap overflow-hidden" title={`${p.value} ${p.unit || ''}`}>
+                      <span className="text-blue-600 dark:text-blue-500 tracking-tighter select-none drop-shadow-[0_0_8px_rgba(37,99,235,0.2)] dark:drop-shadow-[0_0_8px_rgba(59,130,246,0.3)]">{filled}</span>
+                      <span className="text-zinc-300 dark:text-zinc-800 tracking-tighter select-none opacity-50">{empty}</span>
+                   </div>
+
+                   {/* Value Column */}
+                   <div className="text-right pl-2">
                      <span className="text-zinc-700 dark:text-zinc-300 font-bold tabular-nums">
                         {p.value}
                         {p.unit && <span className="text-[10px] text-zinc-500 dark:text-zinc-600 ml-1 font-normal">{p.unit}</span>}
@@ -199,9 +205,9 @@ export const JsonDisplay = forwardRef<JsonDisplayRef, JsonDisplayProps>(({ data 
             })}
           </div>
 
-          <div className="flex items-center gap-3 mt-2 text-[9px] text-zinc-500 dark:text-zinc-600 font-mono">
-            <div className="w-24 shrink-0 pr-3 text-right opacity-0">Labels</div>
-            <div className="flex justify-between w-[20ch] tracking-tighter px-[1px]">
+          <div className="grid grid-cols-[120px_1fr_auto] gap-4 mt-2 text-[9px] text-zinc-500 dark:text-zinc-600 font-mono">
+            <div></div> {/* Spacer for Label */}
+            <div className="flex justify-between tracking-tighter px-[1px]">
                <span>{useLogScale ? minPositive.toExponential(0) : 0}</span>
                <span className="opacity-50">
                   {useLogScale 
@@ -211,6 +217,7 @@ export const JsonDisplay = forwardRef<JsonDisplayRef, JsonDisplayProps>(({ data 
                </span>
                <span>{useLogScale ? maxValue.toExponential(0) : maxValue}</span>
             </div>
+            <div></div> {/* Spacer for Value */}
           </div>
         </div>
       </div>
