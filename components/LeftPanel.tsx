@@ -88,7 +88,7 @@ export const LeftPanel: React.FC<LeftPanelProps> = ({
             {messages.map((msg) => (
             <div 
                 key={msg.id} 
-                className={`flex gap-2.5 items-start animate-in fade-in slide-in-from-bottom-2 duration-300 ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}
+                className="flex gap-2.5 items-start animate-in fade-in slide-in-from-bottom-2 duration-300"
             >
                 <div className={`w-8 h-8 shrink-0 flex items-center justify-center border relative
                 ${msg.role === 'assistant' 
@@ -166,7 +166,7 @@ export const LeftPanel: React.FC<LeftPanelProps> = ({
         )}
         
         {/* Technical Footer */}
-        <div className="mt-4 pt-4 border-t border-dashed border-zinc-200 dark:border-zinc-800 flex justify-between items-center text-[10px] text-zinc-400 dark:text-zinc-600 font-mono tracking-widest uppercase">
+        <div className="mt-4 pt-4 border-t border-dashed border-zinc-200 dark:border-zinc-800 flex justify-between items-baseline text-[10px] text-zinc-400 dark:text-zinc-600 font-mono tracking-widest uppercase">
           <div className="flex items-center gap-1">
              <Cpu size={10} />
              <span>System v3.0.4</span>
