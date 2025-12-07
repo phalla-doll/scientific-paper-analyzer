@@ -23,6 +23,7 @@ const App: React.FC = () => {
   const [isChatting, setIsChatting] = useState(false);
   const [showStickyActions, setShowStickyActions] = useState(false);
   const [stickyCopied, setStickyCopied] = useState(false);
+  const [errorDetail, setErrorDetail] = useState<any>(null);
   
   const fileInputRef = useRef<HTMLInputElement>(null);
   const chatEndRef = useRef<HTMLDivElement>(null);
@@ -97,6 +98,7 @@ const App: React.FC = () => {
     setSelectedFiles([]);
     setAppState(AppState.ANALYZING);
     setShowStickyActions(false);
+    setErrorDetail(null);
     
     addMessage('user', 'Submitted text for analysis.');
     addMessage('assistant', 'Analyzing text content...');
@@ -117,6 +119,7 @@ const App: React.FC = () => {
       if (analysisIdRef.current !== currentId) return;
       console.error(error);
       setAppState(AppState.ERROR);
+      setErrorDetail(error);
       addMessage('assistant', `Error processing text: ${error.message || 'Unknown error'}`);
       trackEvent('analyze_text_failed', { message: error.message });
     }
@@ -151,6 +154,7 @@ const App: React.FC = () => {
 
     setAppState(AppState.PROCESSING_PDF);
     setShowStickyActions(false);
+    setErrorDetail(null);
     const fileNames = selectedFiles.map(f => f.name).join(', ');
     addMessage('user', `Uploaded ${selectedFiles.length} document(s): ${fileNames}`);
     addMessage('assistant', `Processing ${selectedFiles.length} document(s) for multimodal analysis...`);
@@ -182,6 +186,7 @@ const App: React.FC = () => {
       if (analysisIdRef.current !== currentId) return;
       console.error(error);
       setAppState(AppState.ERROR);
+      setErrorDetail(error);
       addMessage('assistant', `Error processing documents: ${error.message || 'Unknown error'}`);
       trackEvent('analyze_pdf_failed', { message: error.message });
     }
@@ -193,6 +198,7 @@ const App: React.FC = () => {
     
     setAppState(AppState.IDLE);
     setAnalysis(null);
+    setErrorDetail(null);
     setShowStickyActions(false);
     addMessage('system', 'Analysis process cancelled by user.');
     trackEvent('analysis_cancelled');
@@ -202,6 +208,7 @@ const App: React.FC = () => {
     trackEvent('app_reset');
     setAnalysis(null);
     setSelectedFiles([]);
+    setErrorDetail(null);
     setAppState(AppState.IDLE);
     setShowStickyActions(false);
     analysisIdRef.current = 0;
@@ -251,6 +258,7 @@ const App: React.FC = () => {
       <RightPanel 
         appState={appState}
         analysis={analysis}
+        errorDetail={errorDetail}
         onReset={() => {
             handleReset();
             // Add specific error reset message if needed

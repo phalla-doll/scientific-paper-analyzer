@@ -9,6 +9,7 @@ import { AppState, PaperAnalysis } from '../types';
 interface RightPanelProps {
   appState: AppState;
   analysis: PaperAnalysis | null;
+  errorDetail?: any;
   onReset: () => void;
   jsonDisplayRef: React.RefObject<JsonDisplayRef>;
   scrollContainerRef: React.RefObject<HTMLDivElement>;
@@ -23,6 +24,7 @@ interface RightPanelProps {
 export const RightPanel: React.FC<RightPanelProps> = ({
   appState,
   analysis,
+  errorDetail,
   onReset,
   jsonDisplayRef,
   scrollContainerRef,
@@ -116,9 +118,36 @@ export const RightPanel: React.FC<RightPanelProps> = ({
                 <div className="h-[400px] flex flex-col items-center justify-center border border-zinc-800 bg-zinc-900/30 relative">
                     <CornerAccents className="border-zinc-700" />
                     {appState === AppState.ERROR ? (
-                        <div className="text-center p-6">
+                        <div className="text-center p-6 w-full px-12">
                             <AlertCircle className="mx-auto mb-2 text-red-500" size={32} />
-                            <p className="text-zinc-500 font-mono text-sm">PROCESS_FAILED</p>
+                            <p className="text-zinc-500 font-mono text-sm mb-6 uppercase tracking-widest">PROCESS_FAILED</p>
+                            
+                            {errorDetail && (
+                                <div className="w-full bg-red-950/10 border border-red-900/50 p-4 text-left relative group">
+                                    <CornerAccents className="border-red-900/50" />
+                                    <h4 className="text-[10px] text-red-500 font-bold uppercase tracking-widest mb-2 border-b border-red-900/30 pb-1">Error Diagnostics</h4>
+                                    <pre className="text-[10px] text-red-400 font-mono whitespace-pre-wrap break-all leading-relaxed overflow-x-auto max-h-[300px] custom-scrollbar">
+                                        {JSON.stringify(errorDetail, (key, value) => {
+                                          if (value instanceof Error) {
+                                            const errObj: any = {
+                                              name: value.name,
+                                              message: value.message,
+                                              stack: value.stack
+                                            };
+                                            // Capture any other custom properties
+                                            Object.getOwnPropertyNames(value).forEach(prop => {
+                                              if (prop !== 'name' && prop !== 'message' && prop !== 'stack') {
+                                                // @ts-ignore
+                                                errObj[prop] = value[prop];
+                                              }
+                                            });
+                                            return errObj;
+                                          }
+                                          return value;
+                                        }, 2)}
+                                    </pre>
+                                </div>
+                            )}
                         </div>
                     ) : (
                       <AnalysisLoader appState={appState} />
