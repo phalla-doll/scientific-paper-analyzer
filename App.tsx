@@ -102,7 +102,7 @@ const AnalysisLoader = ({ appState }: { appState: AppState }) => {
                   {step.label}
                 </span>
                 {status === 'active' && (
-                  <span className="text-[9px] text-blue-500 font-bold animate-pulse">>>></span>
+                  <span className="text-[9px] text-blue-500 font-bold animate-pulse">{'>>>'}</span>
                 )}
               </div>
             </div>
