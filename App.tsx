@@ -466,16 +466,18 @@ const App: React.FC = () => {
                     )}
                 </div>
 
-                <div className="flex justify-center pt-2">
-                  <a 
-                    href="/assets/sample_paper.pdf" 
-                    download
-                    className="flex items-center gap-1.5 text-[10px] text-zinc-600 hover:text-blue-400 transition-colors font-mono uppercase tracking-wide group"
-                  >
-                    <Download size={12} className="group-hover:animate-bounce" />
-                    <span>Download Sample PDF</span>
-                  </a>
-                </div>
+                {selectedFiles.length === 0 && (
+                  <div className="flex justify-center pt-2">
+                    <a 
+                      href="/assets/sample_paper.pdf" 
+                      download
+                      className="flex items-center gap-1.5 text-[10px] text-zinc-600 hover:text-blue-400 transition-colors font-mono uppercase tracking-wide group"
+                    >
+                      <Download size={12} className="group-hover:animate-bounce" />
+                      <span>Download Sample PDF</span>
+                    </a>
+                  </div>
+                )}
             </>
           )}
         </div>
