@@ -26,6 +26,7 @@ A "world-class" multimodal research assistant designed to analyze academic paper
 -   **AI/LLM**: Google GenAI SDK (`@google/genai`), Gemini 2.5 Flash
 -   **PDF Processing**: `pdfjs-dist` (Client-side rasterization)
 -   **Icons**: `lucide-react`
+-   **Analytics**: Google Analytics 4 (GA4)
 
 ## 🚀 Getting Started
 
@@ -75,6 +76,7 @@ You need a Google Gemini API Key to run the analysis.
 │   └── ErrorBoundary.tsx  # React Error Boundary for graceful crash handling
 ├── services/
 │   └── geminiService.ts   # Google GenAI interaction logic & prompts
+│   └── analytics.ts       # GA4 event tracking service
 ├── utils/
 │   └── pdfUtils.ts        # PDF to Image conversion using PDF.js
 ├── App.tsx                # Main application layout, state management, and HUD Loader
