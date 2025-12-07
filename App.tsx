@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Upload, Bot, AlertCircle, CheckCircle2, Sparkles, Send, RefreshCw, MessageSquare, FileText, X, Plus, Play, Download, Square } from 'lucide-react';
-import { JsonDisplay } from './components/JsonDisplay';
+import { Upload, Bot, AlertCircle, CheckCircle2, Sparkles, Send, RefreshCw, MessageSquare, FileText, X, Plus, Play, Download, Square, Copy, Check } from 'lucide-react';
+import { JsonDisplay, JsonDisplayRef } from './components/JsonDisplay';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { convertPdfToImages } from './utils/pdfUtils';
 import { analyzePaper, chatWithPaper } from './services/geminiService';
@@ -128,9 +128,13 @@ const App: React.FC = () => {
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [inputText, setInputText] = useState('');
   const [isChatting, setIsChatting] = useState(false);
+  const [showStickyActions, setShowStickyActions] = useState(false);
+  const [stickyCopied, setStickyCopied] = useState(false);
   
   const fileInputRef = useRef<HTMLInputElement>(null);
   const chatEndRef = useRef<HTMLDivElement>(null);
+  const jsonDisplayRef = useRef<JsonDisplayRef>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
   
   // Ref to track the current analysis session ID. 
   // If the user cancels, we increment this to ignore results from the stale promise.
@@ -139,6 +143,16 @@ const App: React.FC = () => {
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
+
+  const handleScroll = () => {
+    if (scrollContainerRef.current) {
+        // Threshold: 200px. If scrolled past, show sticky actions.
+        const shouldShow = scrollContainerRef.current.scrollTop > 200;
+        if (shouldShow !== showStickyActions) {
+            setShowStickyActions(shouldShow);
+        }
+    }
+  };
 
   const addMessage = (role: Message['role'], content: string) => {
     setMessages(prev => [...prev, {
@@ -189,6 +203,7 @@ const App: React.FC = () => {
     setAnalysis(null);
     setSelectedFiles([]);
     setAppState(AppState.ANALYZING);
+    setShowStickyActions(false);
     
     addMessage('user', 'Submitted text for analysis.');
     addMessage('assistant', 'Analyzing text content...');
@@ -242,6 +257,7 @@ const App: React.FC = () => {
     analysisIdRef.current = currentId;
 
     setAppState(AppState.PROCESSING_PDF);
+    setShowStickyActions(false);
     const fileNames = selectedFiles.map(f => f.name).join(', ');
     addMessage('user', `Uploaded ${selectedFiles.length} document(s): ${fileNames}`);
     addMessage('assistant', `Processing ${selectedFiles.length} document(s) for multimodal analysis...`);
@@ -284,6 +300,7 @@ const App: React.FC = () => {
     
     setAppState(AppState.IDLE);
     setAnalysis(null);
+    setShowStickyActions(false);
     addMessage('system', 'Analysis process cancelled by user.');
     trackEvent('analysis_cancelled');
   };
@@ -293,6 +310,7 @@ const App: React.FC = () => {
     setAnalysis(null);
     setSelectedFiles([]);
     setAppState(AppState.IDLE);
+    setShowStickyActions(false);
     analysisIdRef.current = 0;
     setMessages([{
       id: 'reset',
@@ -533,7 +551,11 @@ const App: React.FC = () => {
       </div>
 
       {/* RIGHT PANEL */}
-      <div className="flex-1 bg-[#09090b] h-full overflow-y-auto relative custom-scrollbar">
+      <div 
+        ref={scrollContainerRef}
+        onScroll={handleScroll}
+        className="flex-1 bg-[#09090b] h-full overflow-y-auto relative custom-scrollbar"
+      >
         {!analysis && appState === AppState.IDLE ? (
           <div className="h-full flex flex-col items-center justify-center text-zinc-600">
             <div className="w-16 h-16 border border-zinc-800 bg-zinc-900 flex items-center justify-center mb-6 relative">
@@ -550,6 +572,39 @@ const App: React.FC = () => {
                    {getHeaderText()}
                 </h2>
                 <div className="flex items-center gap-2">
+                   {/* Sticky Header Actions */}
+                   {showStickyActions && appState === AppState.COMPLETE && (
+                      <>
+                        <button 
+                            onClick={async () => {
+                                if (jsonDisplayRef.current) {
+                                    await jsonDisplayRef.current.copyJson();
+                                    setStickyCopied(true);
+                                    setTimeout(() => setStickyCopied(false), 2000);
+                                }
+                            }}
+                            className={`flex items-center justify-center px-3 py-1 border transition-colors relative
+                                ${stickyCopied 
+                                    ? 'bg-emerald-950/30 text-emerald-400 border-emerald-900' 
+                                    : 'bg-zinc-900 text-zinc-400 border-zinc-700 hover:text-blue-400 hover:border-blue-500/50 hover:bg-blue-950/20'
+                                }`}
+                            title="Copy JSON"
+                        >
+                            <CornerAccents className={stickyCopied ? "border-emerald-800" : "border-zinc-700"} size="w-0.5 h-0.5" />
+                            {stickyCopied ? <Check size={14} /> : <Copy size={14} />}
+                        </button>
+                        <button 
+                             onClick={() => jsonDisplayRef.current?.downloadReport()}
+                             className="flex items-center justify-center px-3 py-1 border bg-zinc-900 text-zinc-400 border-zinc-700 hover:text-blue-400 hover:border-blue-500/50 hover:bg-blue-950/20 transition-colors relative"
+                             title="Download Report"
+                        >
+                             <CornerAccents className="border-zinc-700" size="w-0.5 h-0.5" />
+                             <Download size={14} />
+                        </button>
+                        <div className="w-px h-6 bg-zinc-800 mx-1"></div>
+                      </>
+                   )}
+
                    {appState === AppState.COMPLETE && (
                        <span className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-emerald-400 px-3 py-1 bg-emerald-950/30 border border-emerald-900 relative">
                           <CornerAccents className="border-emerald-800" size="w-0.5 h-0.5" />
@@ -583,7 +638,7 @@ const App: React.FC = () => {
                         }]);
                     }}
                   >
-                      <JsonDisplay data={analysis} />
+                      <JsonDisplay ref={jsonDisplayRef} data={analysis} />
                   </ErrorBoundary>
               ) : (
                   <div className="h-[400px] flex flex-col items-center justify-center border border-zinc-800 bg-zinc-900/30 relative">

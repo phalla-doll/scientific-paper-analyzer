@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, forwardRef, useImperativeHandle } from 'react';
 import { PaperAnalysis, FigureData, DataPoint, MethodologyStage } from '../types';
 import { trackEvent } from '../services/analytics';
 import { 
@@ -6,6 +6,11 @@ import {
   FlaskConical, Binary, Layers, PenTool, Beaker, Download, Workflow, Settings2, Cpu,
   FileText
 } from 'lucide-react';
+
+export interface JsonDisplayRef {
+  copyJson: () => Promise<void>;
+  downloadReport: () => void;
+}
 
 interface JsonDisplayProps {
   data: PaperAnalysis;
@@ -21,7 +26,7 @@ const CornerAccents = ({ color = "border-zinc-700", size = "w-1.5 h-1.5" }) => (
   </>
 );
 
-export const JsonDisplay: React.FC<JsonDisplayProps> = ({ data }) => {
+export const JsonDisplay = forwardRef<JsonDisplayRef, JsonDisplayProps>(({ data }, ref) => {
   const [copied, setCopied] = useState(false);
   const [rawCopied, setRawCopied] = useState(false);
   const [summaryCopied, setSummaryCopied] = useState(false);
@@ -126,6 +131,11 @@ export const JsonDisplay: React.FC<JsonDisplayProps> = ({ data }) => {
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
   };
+
+  useImperativeHandle(ref, () => ({
+    copyJson: handleCopy,
+    downloadReport: handleDownload
+  }));
 
   const renderDataChart = (points: DataPoint[]) => {
     if (!points || points.length === 0) return null;
@@ -489,4 +499,6 @@ export const JsonDisplay: React.FC<JsonDisplayProps> = ({ data }) => {
       </div>
     </div>
   );
-};
+});
+
+JsonDisplay.displayName = 'JsonDisplay';
