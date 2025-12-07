@@ -4,6 +4,7 @@ import { JsonDisplay } from './components/JsonDisplay';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { convertPdfToImages } from './utils/pdfUtils';
 import { analyzePaper, chatWithPaper } from './services/geminiService';
+import { trackEvent } from './services/analytics';
 import { Message, PaperAnalysis, AppState } from './types';
 
 // Minimal HUD Corner Component
@@ -153,12 +154,15 @@ const App: React.FC = () => {
       setInputText('');
       setIsChatting(true);
       addMessage('user', userQuery);
+      
+      trackEvent('chat_query_sent', { query_length: userQuery.length });
 
       try {
         const response = await chatWithPaper(analysis, userQuery, messages);
         addMessage('assistant', response);
       } catch (error: any) {
         addMessage('assistant', `Error: ${error.message}`);
+        trackEvent('chat_error', { message: error.message });
       }
       setIsChatting(false);
       return;
@@ -171,6 +175,9 @@ const App: React.FC = () => {
   const handleTextAnalyze = async () => {
     if (!inputText.trim()) return;
 
+    const textToAnalyze = inputText;
+    trackEvent('analyze_text_submitted', { text_length: textToAnalyze.length });
+
     setAnalysis(null);
     setCurrentFile({ name: 'Text Snippet Analysis' } as File);
     setAppState(AppState.ANALYZING);
@@ -178,7 +185,6 @@ const App: React.FC = () => {
     addMessage('user', 'Submitted text for analysis.');
     addMessage('assistant', 'Analyzing text content...');
     
-    const textToAnalyze = inputText;
     setInputText('');
 
     try {
@@ -187,10 +193,12 @@ const App: React.FC = () => {
       setAnalysis(result);
       setAppState(AppState.COMPLETE);
       addMessage('assistant', 'Analysis complete. You can now ask questions about the paper below.');
+      trackEvent('analyze_text_completed', { success: true });
     } catch (error: any) {
       console.error(error);
       setAppState(AppState.ERROR);
       addMessage('assistant', `Error processing text: ${error.message || 'Unknown error'}`);
+      trackEvent('analyze_text_failed', { message: error.message });
     }
   };
 
@@ -201,6 +209,8 @@ const App: React.FC = () => {
         addMessage('system', 'Please upload a valid PDF file.');
         return;
       }
+      
+      trackEvent('upload_pdf_started', { file_size: file.size });
 
       setCurrentFile(file);
       setAnalysis(null);
@@ -220,16 +230,20 @@ const App: React.FC = () => {
         setAppState(AppState.COMPLETE);
         addMessage('assistant', 'Analysis complete. Structured data extracted.');
         addMessage('assistant', 'System is ready for Q&A. Type below to query the paper.');
+        
+        trackEvent('analyze_pdf_completed', { page_count: images.length });
 
       } catch (error: any) {
         console.error(error);
         setAppState(AppState.ERROR);
         addMessage('assistant', `Error processing document: ${error.message || 'Unknown error'}`);
+        trackEvent('analyze_pdf_failed', { message: error.message });
       }
     }
   };
 
   const handleReset = () => {
+    trackEvent('app_reset');
     setAnalysis(null);
     setCurrentFile(null);
     setAppState(AppState.IDLE);

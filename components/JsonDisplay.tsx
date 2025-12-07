@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { PaperAnalysis, FigureData, DataPoint, MethodologyStage } from '../types';
+import { trackEvent } from '../services/analytics';
 import { 
   Copy, Check, BarChart3, ImageIcon, ScanEye, ArrowRight, Microscope, Activity, 
   FlaskConical, Binary, Layers, PenTool, Beaker, Download, Workflow, Settings2, Cpu
@@ -27,6 +28,7 @@ export const JsonDisplay: React.FC<JsonDisplayProps> = ({ data }) => {
     try {
       await navigator.clipboard.writeText(JSON.stringify(data, null, 2));
       setCopied(true);
+      trackEvent('copy_json_output', { paper_title: data.paper_title });
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
       console.error('Failed to copy text: ', err);
@@ -37,6 +39,7 @@ export const JsonDisplay: React.FC<JsonDisplayProps> = ({ data }) => {
     try {
       await navigator.clipboard.writeText(JSON.stringify(data, null, 2));
       setRawCopied(true);
+      trackEvent('copy_raw_output');
       setTimeout(() => setRawCopied(false), 2000);
     } catch (err) {
       console.error('Failed to copy text: ', err);
@@ -44,6 +47,7 @@ export const JsonDisplay: React.FC<JsonDisplayProps> = ({ data }) => {
   };
 
   const handleDownload = () => {
+    trackEvent('download_markdown_report', { paper_title: data.paper_title });
     const { paper_title, core_hypothesis, methodology_summary, methodology_steps, key_results, conclusions, limitations, figures_data } = data;
     
     let mdContent = `# ${paper_title}\n\n`;
