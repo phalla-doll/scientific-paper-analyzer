@@ -1,5 +1,5 @@
 import React from 'react';
-import { Bot, RefreshCw, MessageSquare, Send, FileText, X, Upload, Plus, Square, Play, Download, Sun, Moon } from 'lucide-react';
+import { Bot, RefreshCw, MessageSquare, Send, FileText, X, Upload, Plus, Square, Play, Download, Sun, Moon, Cpu, Heart, ArrowRight } from 'lucide-react';
 import { ErrorBoundary } from './ErrorBoundary';
 import { CornerAccents } from './CornerAccents';
 import { AppState, Message } from '../types';
@@ -73,8 +73,8 @@ export const LeftPanel: React.FC<LeftPanelProps> = ({
           {isComplete && (
             <button 
                 onClick={handleReset}
-                className="p-2 text-zinc-500 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors"
-                title="Reset / New Analysis"
+                className="p-2 text-zinc-500 hover:text-blue-500 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+                title="Reset Analysis"
             >
                 <RefreshCw size={16} />
             </button>
@@ -82,194 +82,201 @@ export const LeftPanel: React.FC<LeftPanelProps> = ({
         </div>
       </div>
 
-      {/* Chat Area */}
-      <ErrorBoundary componentName="CHAT_LOG">
-        <div className="flex-1 overflow-y-auto p-6 space-y-6 bg-dots-pattern">
-          {messages.map((msg) => (
-            <div key={msg.id} className={`flex flex-col ${msg.role === 'user' ? 'items-end' : 'items-start'} animate-in fade-in slide-in-from-bottom-2`}>
-              <div className={`
-                relative max-w-[90%] px-5 py-4 text-sm leading-relaxed border backdrop-blur-sm transition-colors
+      {/* Messages Area */}
+      <div className="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar relative">
+        <ErrorBoundary componentName="CHAT_LOG">
+            {messages.map((msg) => (
+            <div 
+                key={msg.id} 
+                className={`flex gap-4 animate-in fade-in slide-in-from-bottom-2 duration-300 ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}
+            >
+                <div className={`w-8 h-8 shrink-0 flex items-center justify-center border relative mt-1
+                ${msg.role === 'assistant' 
+                    ? 'bg-blue-600 border-blue-500 text-white shadow-[0_0_10px_rgba(37,99,235,0.3)]' 
+                    : msg.role === 'user'
+                    ? 'bg-zinc-200 border-zinc-300 text-zinc-700 dark:bg-zinc-800 dark:border-zinc-700 dark:text-zinc-300'
+                    : 'bg-zinc-100 border-zinc-200 text-zinc-500 dark:bg-zinc-900 dark:border-zinc-800'
+                }`}
+                >
+                <CornerAccents className={msg.role === 'assistant' ? 'border-blue-300 dark:border-blue-400' : 'border-zinc-400 dark:border-zinc-600'} size="w-0.5 h-0.5" />
+                {msg.role === 'assistant' ? <Bot size={16} /> : msg.role === 'user' ? <MessageSquare size={16} /> : <Bot size={16} className="opacity-50" />}
+                </div>
+                
+                <div className={`flex-1 max-w-[85%] text-sm leading-relaxed p-3 border relative
                 ${msg.role === 'user' 
-                  ? 'bg-zinc-100 text-zinc-800 border-zinc-200 shadow-sm dark:bg-zinc-800/50 dark:text-zinc-200 dark:border-zinc-700' 
-                  : msg.role === 'assistant'
-                    ? 'bg-blue-50 text-blue-900 border-blue-100 dark:bg-blue-950/20 dark:text-blue-200 dark:border-blue-900/50'
-                    : 'text-zinc-500 text-xs font-mono uppercase tracking-wider border-transparent pl-0'
-                }
-              `}>
+                    ? 'bg-zinc-100 border-zinc-200 text-zinc-800 dark:bg-zinc-800/50 dark:border-zinc-700 dark:text-zinc-200' 
+                    : msg.role === 'assistant'
+                    ? 'bg-blue-50 border-blue-100 text-zinc-800 dark:bg-blue-950/20 dark:border-blue-900/50 dark:text-blue-100'
+                    : 'bg-transparent border-transparent text-zinc-500 font-mono text-xs'
+                }`}
+                >
                 {msg.role !== 'system' && (
-                    <CornerAccents className={msg.role === 'user' ? 'border-zinc-300 dark:border-zinc-600' : 'border-blue-200 dark:border-blue-800'} size="w-1 h-1"/>
-                )}
-                {msg.role === 'assistant' && (
-                  <span className="flex items-center gap-2 mb-2 font-bold text-blue-600 dark:text-blue-500 text-[10px] uppercase tracking-widest">
-                    <Bot size={10} /> AI Analysis
-                  </span>
+                    <CornerAccents 
+                        className={msg.role === 'assistant' ? 'border-blue-200 dark:border-blue-800' : 'border-zinc-300 dark:border-zinc-600'} 
+                        size="w-1 h-1" 
+                    />
                 )}
                 {msg.content}
-              </div>
-            </div>
-          ))}
-          {isChatting && (
-            <div className="flex flex-col items-start animate-pulse">
-                <div className="relative max-w-[90%] px-5 py-4 text-sm bg-blue-50 border border-blue-200 text-blue-600 dark:bg-blue-950/10 dark:border-blue-900/30 dark:text-blue-400">
-                    <CornerAccents className="border-blue-300 dark:border-blue-800" size="w-1 h-1"/>
-                    Thinking...
                 </div>
             </div>
-          )}
-          <div ref={chatEndRef} />
-        </div>
-      </ErrorBoundary>
+            ))}
+            <div ref={chatEndRef} />
+        </ErrorBoundary>
+      </div>
 
-      {/* Footer Input Area */}
-      <div className="p-6 border-t border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 space-y-5 relative z-20 transition-colors">
-        <div className="space-y-2">
-          <div className="relative group">
-            <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-1 block flex justify-between">
-              <span>{isComplete ? 'Ask a question about this paper' : 'Input Source'}</span>
-              {isComplete && <span className="text-blue-600 dark:text-blue-500">Q&A Mode Active</span>}
-            </label>
-            
-            <div className="relative">
-              <textarea
-                  value={inputText}
-                  onChange={(e) => setInputText(e.target.value)}
-                  onKeyDown={(e) => {
-                      if (e.key === 'Enter' && !e.shiftKey) {
-                          e.preventDefault();
-                          handleInputSubmit();
-                      }
-                  }}
-                  placeholder={isComplete ? "e.g. What is the sample size? Explain Figure 3." : "Paste abstract text here..."}
-                  className={`w-full h-24 p-3 pr-10 text-xs font-mono bg-zinc-50 dark:bg-zinc-950 border focus:outline-none resize-none transition-all placeholder:text-zinc-400 dark:placeholder:text-zinc-600 text-zinc-900 dark:text-zinc-300
-                      ${isComplete ? 'border-blue-200 dark:border-blue-900/50 focus:border-blue-400 dark:focus:border-blue-500/50 focus:bg-blue-50 dark:focus:bg-blue-950/10' : 'border-zinc-200 dark:border-zinc-800 focus:border-blue-400 dark:focus:border-blue-500/50 focus:bg-white dark:focus:bg-zinc-950'}
-                  `}
-                  disabled={isAnalyzing}
-              />
-              <CornerAccents className={`transition-colors ${isComplete ? 'border-blue-300 dark:border-blue-800' : 'border-zinc-300 dark:border-zinc-700 group-focus-within:border-blue-400 dark:group-focus-within:border-blue-500'}`} />
-              
-              <button
-                  onClick={handleInputSubmit}
-                  disabled={!inputText.trim() || isAnalyzing}
-                  className={`absolute bottom-3 right-3 p-2 text-white transition-colors
-                      ${isComplete ? 'bg-blue-600 hover:bg-blue-500' : 'bg-zinc-600 hover:bg-zinc-500 dark:bg-zinc-700 dark:hover:bg-zinc-600'}
-                      disabled:opacity-50 disabled:cursor-not-allowed
-                  `}
-                  title={isComplete ? "Send Question" : "Analyze Text"}
-              >
-                  {isComplete ? <MessageSquare size={14} /> : <Send size={14} />}
-              </button>
-            </div>
+      {/* Input Section */}
+      <div className="p-6 bg-white dark:bg-zinc-900 border-t border-zinc-200 dark:border-zinc-800 relative z-20">
+        <div className="relative">
+          <textarea
+            value={inputText}
+            onChange={(e) => setInputText(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                handleInputSubmit();
+              }
+            }}
+            placeholder={isChatting ? "Ask a question about this paper..." : "Paste text abstract or hypothesis..."}
+            className="w-full bg-zinc-50 border border-zinc-200 text-zinc-800 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 dark:bg-zinc-950 dark:border-zinc-800 dark:text-zinc-200 dark:focus:border-blue-600 min-h-[80px] p-3 pr-12 text-sm resize-none custom-scrollbar placeholder:text-zinc-400 dark:placeholder:text-zinc-600 transition-colors"
+            disabled={isAnalyzing}
+          />
+          
+          <button 
+            onClick={handleInputSubmit}
+            disabled={!inputText.trim() || (isAnalyzing && !isChatting)}
+            className="absolute bottom-3 right-3 p-2 bg-blue-600 text-white hover:bg-blue-500 disabled:opacity-50 disabled:hover:bg-blue-600 transition-colors group"
+          >
+            <CornerAccents className="border-blue-300 group-hover:border-white" size="w-0.5 h-0.5" />
+            {isChatting ? <Send size={16} /> : <ArrowRight size={16} />}
+          </button>
+        </div>
+
+        {/* Download Sample PDF Link - Only show when no files are selected */}
+        {selectedFiles.length === 0 && (
+          <div className="mt-2 flex justify-end">
+            <a 
+              href="/assets/sample_paper.pdf" 
+              download 
+              className="text-[10px] text-zinc-400 hover:text-blue-500 dark:text-zinc-600 dark:hover:text-blue-400 flex items-center gap-1.5 transition-colors uppercase tracking-wider font-mono cursor-pointer"
+            >
+              <Download size={10} />
+              Download Sample PDF
+            </a>
+          </div>
+        )}
+        
+        {/* Technical Footer */}
+        <div className="mt-4 pt-4 border-t border-dashed border-zinc-200 dark:border-zinc-800 flex justify-between items-center text-[10px] text-zinc-400 dark:text-zinc-600 font-mono tracking-widest uppercase">
+          <div className="flex items-center gap-1">
+             <Cpu size={10} />
+             <span>System v3.0.4</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <span>Made with Gemini-3 by mantha</span>
+            <Heart size={8} className="text-red-500 fill-red-500/50" />
           </div>
         </div>
+      </div>
 
-        {!isComplete && (
-          <>
-              <div className="flex items-center gap-3 text-[10px] text-zinc-400 dark:text-zinc-600 font-bold uppercase tracking-widest">
-                  <div className="h-px bg-zinc-200 dark:bg-zinc-800 flex-1"></div>
-                  <span>OR</span>
-                  <div className="h-px bg-zinc-200 dark:bg-zinc-800 flex-1"></div>
-              </div>
-              
-              {/* File List if files selected */}
-              {selectedFiles.length > 0 && (
-                <div className="space-y-2 mb-4 animate-in fade-in slide-in-from-bottom-2">
-                  <div className="max-h-32 overflow-y-auto space-y-2 pr-1 custom-scrollbar">
-                    {selectedFiles.map((file, idx) => (
-                      <div key={idx} className="flex items-center justify-between bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 p-2 group hover:border-zinc-400 dark:hover:border-zinc-600 transition-colors">
-                         <div className="flex items-center gap-2 overflow-hidden">
-                           <FileText size={14} className="text-zinc-500 group-hover:text-blue-500 dark:group-hover:text-blue-400 shrink-0" />
-                           <span className="text-xs text-zinc-700 dark:text-zinc-400 truncate font-mono">{file.name}</span>
-                         </div>
-                         <button 
-                           onClick={() => handleRemoveFile(idx)}
-                           className="text-zinc-400 hover:text-red-500 dark:text-zinc-600 dark:hover:text-red-400 p-1"
-                           title="Remove file"
-                           disabled={isAnalyzing}
-                         >
-                           <X size={12} />
-                         </button>
-                      </div>
-                    ))}
-                  </div>
+      {/* File Upload Section */}
+      <div className="p-6 bg-zinc-50 dark:bg-zinc-900/50 border-t border-zinc-200 dark:border-zinc-800 transition-colors">
+         {/* File List */}
+         {selectedFiles.length > 0 && (
+            <div className="space-y-2 mb-4 animate-in slide-in-from-bottom-2">
+               {selectedFiles.map((file, idx) => (
+                   <div key={idx} className="flex items-center justify-between p-2 bg-white border border-zinc-200 dark:bg-zinc-900 dark:border-zinc-800 group relative">
+                       <CornerAccents className="border-zinc-300 dark:border-zinc-700" size="w-0.5 h-0.5" />
+                       <div className="flex items-center gap-2 overflow-hidden">
+                          <FileText size={14} className="text-blue-500 shrink-0" />
+                          <span className="text-xs text-zinc-600 dark:text-zinc-300 truncate font-mono">{file.name}</span>
+                       </div>
+                       <button 
+                         onClick={() => handleRemoveFile(idx)}
+                         className="text-zinc-400 hover:text-red-500 dark:text-zinc-600 dark:hover:text-red-400 transition-colors"
+                         disabled={isAnalyzing}
+                       >
+                          <X size={14} />
+                       </button>
+                   </div>
+               ))}
+               
+               {/* Add More Files Button (Small) */}
+               {selectedFiles.length < 5 && (
+                 <div className="relative group cursor-pointer border border-dashed border-zinc-300 dark:border-zinc-700 hover:border-blue-400 dark:hover:border-blue-600 bg-transparent p-2 flex items-center justify-center transition-colors">
+                    <input 
+                        type="file" 
+                        accept="application/pdf"
+                        multiple
+                        onChange={handleFileSelect}
+                        className="absolute inset-0 opacity-0 cursor-pointer"
+                        disabled={isAnalyzing}
+                    />
+                    <Plus size={14} className="text-zinc-400 group-hover:text-blue-500 transition-colors" />
+                 </div>
+               )}
+            </div>
+         )}
+
+         {/* Main Upload Area (Hidden if files selected) */}
+         {selectedFiles.length === 0 && (
+            <div className="relative group cursor-pointer h-32 border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 hover:border-blue-500 dark:hover:border-blue-500 transition-all duration-300 overflow-hidden">
+                <CornerAccents className="border-zinc-300 dark:border-zinc-700 group-hover:border-blue-400 dark:group-hover:border-blue-400 transition-colors" />
+                <div className="absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-blue-50/50 dark:to-blue-900/10 opacity-0 group-hover:opacity-100 transition-opacity" />
+                
+                <input 
+                    type="file" 
+                    accept="application/pdf"
+                    multiple
+                    onChange={handleFileSelect}
+                    ref={fileInputRef}
+                    className="absolute inset-0 opacity-0 cursor-pointer z-10"
+                />
+                
+                <div className="absolute inset-0 flex flex-col items-center justify-center gap-3">
+                    <div className="w-10 h-10 bg-zinc-100 dark:bg-zinc-800 rounded-none flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                        <Upload size={20} className="text-zinc-400 group-hover:text-blue-500 dark:text-zinc-500 transition-colors" />
+                    </div>
+                    <div className="text-center space-y-1">
+                        <p className="text-xs font-bold uppercase tracking-widest text-zinc-500 dark:text-zinc-400 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                            Upload Research PDF
+                        </p>
+                        <p className="text-[10px] text-zinc-400 dark:text-zinc-600 font-mono">
+                            Drag & drop or click to browse
+                        </p>
+                    </div>
                 </div>
-              )}
+            </div>
+         )}
 
-              <div className="flex gap-2">
-                  <input
-                      type="file"
-                      ref={fileInputRef}
-                      onChange={handleFileSelect}
-                      className="hidden"
-                      accept=".pdf"
-                      multiple
-                  />
-                  
-                  {/* Upload/Add Button */}
-                  <button
-                  onClick={() => fileInputRef.current?.click()}
-                  disabled={!isIdle}
-                  className={`group border border-zinc-200 dark:border-zinc-800 hover:border-blue-400 dark:hover:border-blue-500/50 bg-zinc-50 dark:bg-zinc-900 hover:bg-blue-50 dark:hover:bg-blue-900/10 transition-all duration-300 flex flex-col items-center justify-center gap-2 relative focus:outline-none disabled:opacity-50
-                    ${selectedFiles.length > 0 ? 'w-1/3 h-12' : 'w-full h-20'}
-                  `}
-                  title="Upload PDF(s)"
-                  >
-                  <CornerAccents className="border-zinc-300 dark:border-zinc-800 group-hover:border-blue-400 dark:group-hover:border-blue-500/50 transition-colors" />
-                  {selectedFiles.length > 0 ? (
-                     <Plus className="w-5 h-5 text-zinc-500 group-hover:text-blue-500 dark:group-hover:text-blue-400" />
-                  ) : (
-                    <>
-                      <div className="flex items-center gap-2 text-zinc-500 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
-                          <Upload className="w-4 h-4" />
-                          <span className="text-xs font-bold uppercase tracking-widest">Upload PDF</span>
-                      </div>
-                    </>
-                  )}
-                  </button>
+         {/* Analyze Action Button */}
+         {selectedFiles.length > 0 && !isAnalyzing && (
+             <button
+                onClick={handleAnalyzeFiles}
+                className="w-full relative py-3 bg-blue-600 hover:bg-blue-500 text-white uppercase tracking-widest text-xs font-bold transition-all group overflow-hidden"
+             >
+                <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20"></div>
+                <CornerAccents className="border-blue-300 group-hover:border-white" size="w-1 h-1" />
+                <span className="relative flex items-center justify-center gap-2 leading-none">
+                   <Play size={14} /> 
+                   <span>Start Analysis</span>
+                </span>
+             </button>
+         )}
 
-                  {/* Analyze Button OR Cancel Button */}
-                  {selectedFiles.length > 0 && (
-                    isAnalyzing ? (
-                      <button
-                        onClick={handleCancelAnalysis}
-                        className="group flex-1 border border-red-200 dark:border-red-900/50 bg-red-600 hover:bg-red-500 text-white transition-all duration-300 flex items-center justify-center gap-2 relative focus:outline-none h-12"
-                        title="Cancel Analysis"
-                      >
-                         <CornerAccents className="border-red-400" />
-                         <Square size={14} fill="currentColor" />
-                         <span className="text-xs font-bold uppercase tracking-widest">
-                           Cancel
-                         </span>
-                      </button>
-                    ) : (
-                      <button
-                        onClick={handleAnalyzeFiles}
-                        className="group flex-1 border border-blue-200 dark:border-blue-900/50 bg-blue-600 hover:bg-blue-500 text-white transition-all duration-300 flex items-center justify-center gap-2 relative focus:outline-none h-12"
-                        title="Start Analysis"
-                      >
-                         <CornerAccents className="border-blue-400" />
-                         <Play size={14} fill="currentColor" />
-                         <span className="text-xs font-bold uppercase tracking-widest">
-                           Analyze {selectedFiles.length > 1 ? `(${selectedFiles.length})` : ''}
-                         </span>
-                      </button>
-                    )
-                  )}
-              </div>
-
-              {selectedFiles.length === 0 && (
-                <div className="flex justify-center pt-2">
-                  <a 
-                    href="/assets/sample_paper.pdf" 
-                    download
-                    className="flex items-center gap-1.5 text-[10px] text-zinc-500 hover:text-blue-600 dark:text-zinc-600 dark:hover:text-blue-400 transition-colors font-mono uppercase tracking-wide group"
-                  >
-                    <Download size={12} className="group-hover:animate-bounce" />
-                    <span>Download Sample PDF</span>
-                  </a>
-                </div>
-              )}
-          </>
-        )}
+         {/* Cancel Button */}
+         {isAnalyzing && (
+             <button
+                onClick={handleCancelAnalysis}
+                className="w-full relative py-3 bg-red-600 hover:bg-red-500 text-white uppercase tracking-widest text-xs font-bold transition-all group overflow-hidden animate-in fade-in"
+             >
+                <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20"></div>
+                <CornerAccents className="border-red-300 group-hover:border-white" size="w-1 h-1" />
+                <span className="relative flex items-center justify-center gap-2 leading-none">
+                   <Square size={14} fill="currentColor" /> 
+                   <span>Cancel Process</span>
+                </span>
+             </button>
+         )}
       </div>
     </div>
   );
