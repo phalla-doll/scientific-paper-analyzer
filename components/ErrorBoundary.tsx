@@ -1,7 +1,7 @@
 import React, { Component, ErrorInfo, ReactNode } from 'react';
 import { AlertCircle, RefreshCw } from 'lucide-react';
 
-const CornerAccents = ({ className = "border-red-200", size = "w-1.5 h-1.5" }) => (
+const CornerAccents = ({ className = "border-red-900", size = "w-1.5 h-1.5" }) => (
   <>
     <div className={`absolute top-0 left-0 ${size} border-l border-t ${className}`} />
     <div className={`absolute top-0 right-0 ${size} border-r border-t ${className}`} />
@@ -50,24 +50,24 @@ export class ErrorBoundary extends Component<Props, State> {
       }
 
       return (
-        <div className="relative w-full border border-red-200 bg-red-50/10 p-8 flex flex-col items-center justify-center text-center min-h-[250px] animate-in fade-in zoom-in-95 duration-300 backdrop-blur-sm my-4">
-          <CornerAccents className="border-red-300" />
+        <div className="relative w-full border border-red-900 bg-red-950/10 p-8 flex flex-col items-center justify-center text-center min-h-[250px] animate-in fade-in zoom-in-95 duration-300 backdrop-blur-sm my-4">
+          <CornerAccents className="border-red-800" />
           
-          <div className="w-12 h-12 bg-red-100/50 flex items-center justify-center mb-4 relative">
-             <CornerAccents className="border-red-400" size="w-1 h-1" />
+          <div className="w-12 h-12 bg-red-900/20 flex items-center justify-center mb-4 relative">
+             <CornerAccents className="border-red-600" size="w-1 h-1" />
              <AlertCircle size={24} className="text-red-500" />
           </div>
 
-          <h3 className="text-red-600 font-mono font-bold uppercase tracking-widest text-sm mb-2">
+          <h3 className="text-red-500 font-mono font-bold uppercase tracking-widest text-sm mb-2">
             Rendering Fault
           </h3>
           
-          <p className="text-red-500/70 text-xs font-mono mb-6 max-w-sm uppercase tracking-wide">
+          <p className="text-red-400/70 text-xs font-mono mb-6 max-w-sm uppercase tracking-wide">
              Module [{this.props.componentName || 'UNKNOWN_COMPONENT'}] encountered a critical exception.
           </p>
 
           {this.state.error && (
-             <div className="w-full max-w-md bg-white/50 border border-red-100 p-3 mb-6 text-left overflow-hidden">
+             <div className="w-full max-w-md bg-black/50 border border-red-900/50 p-3 mb-6 text-left overflow-hidden">
                 <p className="font-mono text-[10px] text-red-400 break-all leading-relaxed line-clamp-4">
                    Error: {this.state.error.message}
                 </p>
@@ -76,10 +76,10 @@ export class ErrorBoundary extends Component<Props, State> {
 
           <button
             onClick={this.handleReset}
-            className="group relative px-6 py-2 bg-white border border-red-200 hover:border-red-400 hover:bg-red-50 transition-all cursor-pointer"
+            className="group relative px-6 py-2 bg-zinc-900 border border-red-900/50 hover:border-red-500 hover:bg-red-950/20 transition-all cursor-pointer"
           >
-            <CornerAccents className="border-red-200 group-hover:border-red-400" size="w-1 h-1" />
-            <div className="flex items-center gap-2 text-red-600 text-xs font-bold uppercase tracking-widest">
+            <CornerAccents className="border-red-900 group-hover:border-red-500" size="w-1 h-1" />
+            <div className="flex items-center gap-2 text-red-500 text-xs font-bold uppercase tracking-widest">
                 <RefreshCw size={12} className="group-hover:rotate-180 transition-transform duration-500" />
                 <span>Reset Module</span>
             </div>

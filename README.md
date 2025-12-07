@@ -1,6 +1,6 @@
 # Scientific Paper Analyzer
 
-A "world-class" multimodal research assistant designed to analyze academic papers (PDFs or text) using Google's Gemini 2.5 Flash model. The application "derenders" documents to extract structured data, visualize methodologies, interpret figures, and generate synthetic insights in a minimal, futuristic HUD-style interface.
+A "world-class" multimodal research assistant designed to analyze academic papers (PDFs or text) using Google's Gemini 2.5 Flash model. The application "derenders" documents to extract structured data, visualize methodologies, interpret figures, and generate synthetic insights in a premium, dark-mode HUD-style interface.
 
 ## ✨ Features
 
@@ -17,7 +17,7 @@ A "world-class" multimodal research assistant designed to analyze academic paper
     -   **Figure Interpretation**: Detects figure types (Charts, Micrographs, Diagrams) and generates text-based ASCII charts for extracted numerical data.
 -   **Fault Tolerance**: Integrated React Error Boundaries wrap critical components (Visualization Engine, Chat Log) to ensure graceful failure handling. If a module crashes, users can reset it without losing the entire application state.
 -   **Export**: Download the full analysis as a formatted Markdown (`.md`) report.
--   **Futuristic HUD Aesthetic**: Designed with a technical, 0-radius "Head-Up Display" visual style featuring corner accents, monospaced typography, and precise grid layouts.
+-   **Premium Dark Mode & HUD Aesthetic**: A sophisticated, fully dark-themed interface (Zinc/Black palette) designed with a technical, 0-radius "Head-Up Display" visual style. Features glowing accents, corner brackets, monospaced typography, and precise grid layouts for a professional research environment.
 
 ## 🛠 Tech Stack
 

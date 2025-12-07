@@ -7,7 +7,7 @@ import { analyzePaper, chatWithPaper } from './services/geminiService';
 import { Message, PaperAnalysis, AppState } from './types';
 
 // Minimal HUD Corner Component
-const CornerAccents = ({ className = "border-blue-200", size = "w-1.5 h-1.5" }) => (
+const CornerAccents = ({ className = "border-blue-500/30", size = "w-1.5 h-1.5" }) => (
   <>
     <div className={`absolute top-0 left-0 ${size} border-l border-t ${className}`} />
     <div className={`absolute top-0 right-0 ${size} border-r border-t ${className}`} />
@@ -58,20 +58,20 @@ const AnalysisLoader = ({ appState }: { appState: AppState }) => {
       {/* Central Tech Graphic */}
       <div className="relative w-24 h-24 mb-12">
         {/* Outer Ring */}
-        <div className="absolute inset-0 border border-blue-100/50 rounded-none transform rotate-45 loader-spin" />
-        <div className="absolute inset-0 border border-blue-100/50 rounded-none transform -rotate-45 loader-spin-reverse" />
+        <div className="absolute inset-0 border border-blue-900/40 rounded-none transform rotate-45 loader-spin" />
+        <div className="absolute inset-0 border border-blue-900/40 rounded-none transform -rotate-45 loader-spin-reverse" />
         
         {/* Active Ring */}
         <div className="absolute inset-2 border-t-2 border-r-2 border-blue-500 rounded-none loader-spin" />
         
         {/* Core */}
-        <div className="absolute inset-[30%] bg-blue-50 border border-blue-200 flex items-center justify-center shadow-[0_0_15px_rgba(59,130,246,0.3)]">
-           <div className="w-1.5 h-1.5 bg-blue-600 loader-pulse" />
+        <div className="absolute inset-[30%] bg-blue-950/30 border border-blue-500/30 flex items-center justify-center shadow-[0_0_25px_rgba(59,130,246,0.2)]">
+           <div className="w-1.5 h-1.5 bg-blue-400 loader-pulse shadow-[0_0_10px_rgba(59,130,246,0.8)]" />
         </div>
 
         {/* HUD Accents */}
-        <div className="absolute -top-2 -left-2 w-2 h-2 border-t border-l border-blue-300" />
-        <div className="absolute -bottom-2 -right-2 w-2 h-2 border-b border-r border-blue-300" />
+        <div className="absolute -top-2 -left-2 w-2 h-2 border-t border-l border-blue-800" />
+        <div className="absolute -bottom-2 -right-2 w-2 h-2 border-b border-r border-blue-800" />
       </div>
 
       {/* Status Steps */}
@@ -85,24 +85,24 @@ const AnalysisLoader = ({ appState }: { appState: AppState }) => {
             >
               <div className="relative flex items-center justify-center w-5 h-5 shrink-0">
                 {status === 'complete' && (
-                  <div className="bg-blue-600 w-full h-full flex items-center justify-center text-white shadow-sm">
+                  <div className="bg-blue-600 w-full h-full flex items-center justify-center text-white shadow-[0_0_10px_rgba(37,99,235,0.5)]">
                     <CheckCircle2 size={12} />
                   </div>
                 )}
                 {status === 'active' && (
-                  <div className="w-2 h-2 bg-blue-600 shadow-[0_0_8px_rgba(37,99,235,0.8)] loader-pulse" />
+                  <div className="w-2 h-2 bg-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.8)] loader-pulse" />
                 )}
                 {status === 'pending' && (
-                  <div className="w-1.5 h-1.5 bg-gray-200" />
+                  <div className="w-1.5 h-1.5 bg-zinc-800" />
                 )}
               </div>
               
-              <div className="flex-1 flex justify-between items-baseline border-b border-dashed border-gray-200 pb-2">
-                <span className={`text-[10px] tracking-[0.2em] font-bold ${status === 'active' ? 'text-blue-600' : 'text-gray-500'}`}>
+              <div className="flex-1 flex justify-between items-baseline border-b border-dashed border-zinc-800 pb-2">
+                <span className={`text-[10px] tracking-[0.2em] font-bold ${status === 'active' ? 'text-blue-400' : 'text-zinc-600'}`}>
                   {step.label}
                 </span>
                 {status === 'active' && (
-                  <span className="text-[9px] text-blue-400 font-bold animate-pulse">>>></span>
+                  <span className="text-[9px] text-blue-500 font-bold animate-pulse">>>></span>
                 )}
               </div>
             </div>
@@ -245,26 +245,26 @@ const App: React.FC = () => {
   const isComplete = appState === AppState.COMPLETE;
 
   return (
-    <div className="flex h-screen w-full bg-[#fafafa] overflow-hidden font-sans">
+    <div className="flex h-screen w-full bg-[#09090b] text-zinc-200 overflow-hidden font-sans selection:bg-blue-500/30">
       {/* LEFT PANEL */}
-      <div className="w-1/3 min-w-[350px] max-w-[500px] border-r border-gray-200 flex flex-col bg-white h-full z-10 shadow-[4px_0_24px_-4px_rgba(0,0,0,0.05)]">
+      <div className="w-1/3 min-w-[350px] max-w-[500px] border-r border-zinc-800 flex flex-col bg-zinc-900/50 h-full z-10 shadow-[4px_0_24px_-4px_rgba(0,0,0,0.3)]">
         
         {/* Header */}
-        <div className="p-6 border-b border-gray-100 flex items-center justify-between">
+        <div className="p-6 border-b border-zinc-800 flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <div className="w-8 h-8 bg-blue-600 flex items-center justify-center text-white shadow-sm relative group cursor-default">
+            <div className="w-8 h-8 bg-blue-600 flex items-center justify-center text-white shadow-[0_0_15px_rgba(37,99,235,0.5)] relative group cursor-default">
               <CornerAccents className="border-blue-400 group-hover:border-white transition-colors" size="w-0.5 h-0.5" />
               <Bot size={20} />
             </div>
             <div>
-              <h1 className="font-bold text-gray-900 text-lg tracking-tight uppercase leading-none">Research<br/>Assistant</h1>
+              <h1 className="font-bold text-zinc-100 text-lg tracking-tight uppercase leading-none">Research<br/>Assistant</h1>
             </div>
           </div>
           
           {isComplete && (
             <button 
                 onClick={handleReset}
-                className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors"
+                className="p-2 text-zinc-500 hover:text-red-400 hover:bg-red-500/10 transition-colors"
                 title="Reset / New Analysis"
             >
                 <RefreshCw size={16} />
@@ -280,17 +280,17 @@ const App: React.FC = () => {
                 <div className={`
                   relative max-w-[90%] px-5 py-4 text-sm leading-relaxed border backdrop-blur-sm
                   ${msg.role === 'user' 
-                    ? 'bg-gray-50 text-gray-800 border-gray-200 shadow-sm' 
+                    ? 'bg-zinc-800/50 text-zinc-200 border-zinc-700 shadow-sm' 
                     : msg.role === 'assistant'
-                      ? 'bg-blue-50/40 text-blue-900 border-blue-100'
-                      : 'text-gray-400 text-xs font-mono uppercase tracking-wider border-transparent pl-0'
+                      ? 'bg-blue-950/20 text-blue-200 border-blue-900/50'
+                      : 'text-zinc-500 text-xs font-mono uppercase tracking-wider border-transparent pl-0'
                   }
                 `}>
                   {msg.role !== 'system' && (
-                      <CornerAccents className={msg.role === 'user' ? 'border-gray-300' : 'border-blue-200'} size="w-1 h-1"/>
+                      <CornerAccents className={msg.role === 'user' ? 'border-zinc-600' : 'border-blue-800'} size="w-1 h-1"/>
                   )}
                   {msg.role === 'assistant' && (
-                    <span className="flex items-center gap-2 mb-2 font-bold text-blue-600 text-[10px] uppercase tracking-widest">
+                    <span className="flex items-center gap-2 mb-2 font-bold text-blue-500 text-[10px] uppercase tracking-widest">
                       <Bot size={10} /> AI Analysis
                     </span>
                   )}
@@ -300,8 +300,8 @@ const App: React.FC = () => {
             ))}
             {isChatting && (
               <div className="flex flex-col items-start animate-pulse">
-                  <div className="relative max-w-[90%] px-5 py-4 text-sm bg-blue-50/20 border border-blue-100 text-blue-400">
-                      <CornerAccents className="border-blue-200" size="w-1 h-1"/>
+                  <div className="relative max-w-[90%] px-5 py-4 text-sm bg-blue-950/10 border border-blue-900/30 text-blue-400">
+                      <CornerAccents className="border-blue-800" size="w-1 h-1"/>
                       Thinking...
                   </div>
               </div>
@@ -311,10 +311,10 @@ const App: React.FC = () => {
         </ErrorBoundary>
 
         {/* Footer Input Area */}
-        <div className="p-6 border-t border-gray-100 bg-white space-y-5 relative z-20">
+        <div className="p-6 border-t border-zinc-800 bg-zinc-900 space-y-5 relative z-20">
           <div className="space-y-2">
             <div className="relative group">
-              <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1 block flex justify-between">
+              <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-1 block flex justify-between">
                 <span>{isComplete ? 'Ask a question about this paper' : 'Input Source'}</span>
                 {isComplete && <span className="text-blue-500">Q&A Mode Active</span>}
               </label>
@@ -330,18 +330,18 @@ const App: React.FC = () => {
                         }
                     }}
                     placeholder={isComplete ? "e.g. What is the sample size? Explain Figure 3." : "Paste abstract text here..."}
-                    className={`w-full h-24 p-3 pr-10 text-xs font-mono bg-gray-50 border focus:outline-none resize-none transition-all placeholder:text-gray-400
-                        ${isComplete ? 'border-blue-200 focus:border-blue-400 focus:bg-blue-50/10' : 'border-gray-200 focus:border-blue-400 focus:bg-white'}
+                    className={`w-full h-24 p-3 pr-10 text-xs font-mono bg-zinc-950 border focus:outline-none resize-none transition-all placeholder:text-zinc-600 text-zinc-300
+                        ${isComplete ? 'border-blue-900/50 focus:border-blue-500/50 focus:bg-blue-950/10' : 'border-zinc-800 focus:border-blue-500/50 focus:bg-zinc-950'}
                     `}
                     disabled={appState === AppState.PROCESSING_PDF || appState === AppState.ANALYZING}
                 />
-                <CornerAccents className={`transition-colors ${isComplete ? 'border-blue-300' : 'border-gray-200 group-focus-within:border-blue-400'}`} />
+                <CornerAccents className={`transition-colors ${isComplete ? 'border-blue-800' : 'border-zinc-700 group-focus-within:border-blue-500'}`} />
                 
                 <button
                     onClick={handleInputSubmit}
                     disabled={!inputText.trim() || appState === AppState.PROCESSING_PDF || appState === AppState.ANALYZING}
                     className={`absolute bottom-3 right-3 p-2 text-white transition-colors
-                        ${isComplete ? 'bg-blue-600 hover:bg-blue-700' : 'bg-gray-800 hover:bg-black'}
+                        ${isComplete ? 'bg-blue-600 hover:bg-blue-500' : 'bg-zinc-700 hover:bg-zinc-600'}
                         disabled:opacity-50 disabled:cursor-not-allowed
                     `}
                     title={isComplete ? "Send Question" : "Analyze Text"}
@@ -354,10 +354,10 @@ const App: React.FC = () => {
 
           {!isComplete && (
             <>
-                <div className="flex items-center gap-3 text-[10px] text-gray-300 font-bold uppercase tracking-widest">
-                    <div className="h-px bg-gray-100 flex-1"></div>
+                <div className="flex items-center gap-3 text-[10px] text-zinc-600 font-bold uppercase tracking-widest">
+                    <div className="h-px bg-zinc-800 flex-1"></div>
                     <span>OR</span>
-                    <div className="h-px bg-gray-100 flex-1"></div>
+                    <div className="h-px bg-zinc-800 flex-1"></div>
                 </div>
                 
                 <input
@@ -371,10 +371,10 @@ const App: React.FC = () => {
                 <button
                 onClick={() => fileInputRef.current?.click()}
                 disabled={!isIdle}
-                className="group w-full h-20 border border-gray-200 hover:border-blue-400 bg-white hover:bg-blue-50/10 transition-all duration-300 flex flex-col items-center justify-center gap-2 relative focus:outline-none disabled:opacity-50"
+                className="group w-full h-20 border border-zinc-800 hover:border-blue-500/50 bg-zinc-900 hover:bg-blue-900/10 transition-all duration-300 flex flex-col items-center justify-center gap-2 relative focus:outline-none disabled:opacity-50"
                 >
-                <CornerAccents className="border-gray-200 group-hover:border-blue-400 transition-colors" />
-                <div className="flex items-center gap-2 text-gray-400 group-hover:text-blue-500 transition-colors">
+                <CornerAccents className="border-zinc-800 group-hover:border-blue-500/50 transition-colors" />
+                <div className="flex items-center gap-2 text-zinc-500 group-hover:text-blue-400 transition-colors">
                     <Upload className="w-4 h-4" />
                     <span className="text-xs font-bold uppercase tracking-widest">Upload PDF</span>
                 </div>
@@ -385,33 +385,33 @@ const App: React.FC = () => {
       </div>
 
       {/* RIGHT PANEL */}
-      <div className="flex-1 bg-[#fafafa] h-full overflow-y-auto relative custom-scrollbar">
+      <div className="flex-1 bg-[#09090b] h-full overflow-y-auto relative custom-scrollbar">
         {!currentFile ? (
-          <div className="h-full flex flex-col items-center justify-center text-gray-400">
-            <div className="w-16 h-16 border border-gray-200 bg-white flex items-center justify-center mb-6 relative">
-              <CornerAccents className="border-gray-300" />
-              <Sparkles size={24} className="text-gray-300" />
+          <div className="h-full flex flex-col items-center justify-center text-zinc-600">
+            <div className="w-16 h-16 border border-zinc-800 bg-zinc-900 flex items-center justify-center mb-6 relative">
+              <CornerAccents className="border-zinc-700" />
+              <Sparkles size={24} className="text-zinc-600" />
             </div>
-            <p className="text-sm font-bold uppercase tracking-widest text-gray-500">System Ready</p>
-            <p className="text-xs text-gray-400 mt-2">Awaiting Input Stream</p>
+            <p className="text-sm font-bold uppercase tracking-widest text-zinc-500">System Ready</p>
+            <p className="text-xs text-zinc-700 mt-2">Awaiting Input Stream</p>
           </div>
         ) : (
           <div className="p-8 max-w-4xl mx-auto min-h-full">
-            <div className="flex items-center justify-between mb-8 sticky top-0 bg-[#fafafa]/95 backdrop-blur z-20 py-4 border-b border-gray-200 transition-all">
-                <h2 className="text-xs font-mono text-gray-500 truncate max-w-md uppercase">
+            <div className="flex items-center justify-between mb-8 sticky top-0 bg-[#09090b]/95 backdrop-blur z-20 py-4 border-b border-zinc-800 transition-all">
+                <h2 className="text-xs font-mono text-zinc-500 truncate max-w-md uppercase">
                    FILE: {currentFile.name}
                 </h2>
                 <div className="flex items-center gap-2">
                    {appState === AppState.COMPLETE && (
-                       <span className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-green-700 px-3 py-1 bg-green-50 border border-green-200 relative">
-                          <CornerAccents className="border-green-300" size="w-0.5 h-0.5" />
+                       <span className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-emerald-400 px-3 py-1 bg-emerald-950/30 border border-emerald-900 relative">
+                          <CornerAccents className="border-emerald-800" size="w-0.5 h-0.5" />
                           <CheckCircle2 size={10} />
                           Analysis Complete
                        </span>
                    )}
                    {appState === AppState.ERROR && (
-                       <span className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-red-700 px-3 py-1 bg-red-50 border border-red-200 relative">
-                          <CornerAccents className="border-red-300" size="w-0.5 h-0.5" />
+                       <span className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-red-400 px-3 py-1 bg-red-950/30 border border-red-900 relative">
+                          <CornerAccents className="border-red-800" size="w-0.5 h-0.5" />
                           <AlertCircle size={10} />
                           Error
                        </span>
@@ -438,12 +438,12 @@ const App: React.FC = () => {
                       <JsonDisplay data={analysis} />
                   </ErrorBoundary>
               ) : (
-                  <div className="h-[400px] flex flex-col items-center justify-center border border-gray-200 bg-white relative">
-                      <CornerAccents />
+                  <div className="h-[400px] flex flex-col items-center justify-center border border-zinc-800 bg-zinc-900/30 relative">
+                      <CornerAccents className="border-zinc-700" />
                       {appState === AppState.ERROR ? (
                           <div className="text-center p-6">
-                              <AlertCircle className="mx-auto mb-2 text-red-400" size={32} />
-                              <p className="text-gray-500 font-mono text-sm">PROCESS_FAILED</p>
+                              <AlertCircle className="mx-auto mb-2 text-red-500" size={32} />
+                              <p className="text-zinc-500 font-mono text-sm">PROCESS_FAILED</p>
                           </div>
                       ) : (
                         <AnalysisLoader appState={appState} />

@@ -10,7 +10,7 @@ interface JsonDisplayProps {
 }
 
 // Reusable Corner Accent Component for that "Tech/HUD" look
-const CornerAccents = ({ color = "border-gray-300", size = "w-1.5 h-1.5" }) => (
+const CornerAccents = ({ color = "border-zinc-700", size = "w-1.5 h-1.5" }) => (
   <>
     <div className={`absolute top-0 left-0 ${size} border-l border-t ${color}`} />
     <div className={`absolute top-0 right-0 ${size} border-r border-t ${color}`} />
@@ -106,13 +106,13 @@ export const JsonDisplay: React.FC<JsonDisplayProps> = ({ data }) => {
     const maxBarChars = 20;
     
     return (
-      <div className="mt-4 pt-3 border-t border-gray-100">
-        <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-          <Activity size={12} className="text-blue-600" /> 
+      <div className="mt-4 pt-3 border-t border-zinc-800">
+        <h4 className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+          <Activity size={12} className="text-blue-500" /> 
           Data Distribution
         </h4>
-        <div className="font-mono text-xs bg-gray-50 p-4 border border-gray-200 overflow-x-auto relative">
-          <CornerAccents color="border-gray-300" size="w-1 h-1" />
+        <div className="font-mono text-xs bg-zinc-950 p-4 border border-zinc-800 overflow-x-auto relative">
+          <CornerAccents color="border-zinc-700" size="w-1 h-1" />
           {points.map((p, idx) => {
             const filledCount = Math.max(0, Math.round((p.value / maxValue) * maxBarChars));
             const emptyCount = Math.max(0, maxBarChars - filledCount);
@@ -120,15 +120,15 @@ export const JsonDisplay: React.FC<JsonDisplayProps> = ({ data }) => {
             const empty = '░'.repeat(emptyCount);
 
             return (
-              <div key={idx} className="flex items-center gap-3 leading-relaxed hover:bg-gray-100 px-1 -mx-1 transition-colors">
-                 <span className="w-24 truncate text-gray-500 text-right shrink-0" title={p.label}>{p.label}</span>
-                 <span className="text-blue-600 tracking-tight select-none">
+              <div key={idx} className="flex items-center gap-3 leading-relaxed hover:bg-zinc-900 px-1 -mx-1 transition-colors">
+                 <span className="w-24 truncate text-zinc-500 text-right shrink-0" title={p.label}>{p.label}</span>
+                 <span className="text-blue-500 tracking-tight select-none">
                     {filled}
-                    <span className="text-gray-300">{empty}</span>
+                    <span className="text-zinc-800">{empty}</span>
                  </span>
-                 <span className="shrink-0 text-gray-900 font-semibold tabular-nums">
+                 <span className="shrink-0 text-zinc-300 font-semibold tabular-nums">
                     {p.value}
-                    {p.unit && <span className="text-[10px] text-gray-400 ml-0.5 font-normal">{p.unit}</span>}
+                    {p.unit && <span className="text-[10px] text-zinc-600 ml-0.5 font-normal">{p.unit}</span>}
                  </span>
               </div>
             );
@@ -176,32 +176,32 @@ export const JsonDisplay: React.FC<JsonDisplayProps> = ({ data }) => {
   };
 
   return (
-    <div className="space-y-8 font-sans text-gray-800">
-      <div className="border-b border-gray-200 pb-4">
+    <div className="space-y-8 font-sans text-zinc-300">
+      <div className="border-b border-zinc-800 pb-4">
         <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
-            <h2 className="text-xl font-bold tracking-tight uppercase">{data.paper_title}</h2>
+            <h2 className="text-xl font-bold tracking-tight uppercase text-zinc-100">{data.paper_title}</h2>
             
             <div className="flex items-center gap-2 shrink-0">
               <button 
                 onClick={handleCopy}
                 className={`group relative flex items-center gap-2 text-xs font-medium transition-all border px-4 py-2 uppercase tracking-wide
                   ${copied 
-                    ? 'bg-green-50 text-green-700 border-green-300' 
-                    : 'bg-white text-gray-600 border-gray-300 hover:text-blue-600 hover:border-blue-400 hover:bg-blue-50'
+                    ? 'bg-emerald-950/30 text-emerald-400 border-emerald-900' 
+                    : 'bg-zinc-900 text-zinc-400 border-zinc-700 hover:text-blue-400 hover:border-blue-500/50 hover:bg-blue-950/20'
                   }`}
                 title="Copy JSON to clipboard"
               >
-                <CornerAccents color={copied ? "border-green-400" : "border-gray-400 group-hover:border-blue-400"} size="w-1 h-1"/>
-                {copied ? <Check size={14} className="text-green-600" /> : <Copy size={14} />}
+                <CornerAccents color={copied ? "border-emerald-800" : "border-zinc-700 group-hover:border-blue-500/50"} size="w-1 h-1"/>
+                {copied ? <Check size={14} className="text-emerald-500" /> : <Copy size={14} />}
                 {copied ? 'COPIED' : 'COPY JSON'}
               </button>
 
               <button 
                 onClick={handleDownload}
-                className="group relative flex items-center gap-2 text-xs font-medium transition-all border px-4 py-2 bg-white text-gray-600 border-gray-300 hover:text-blue-600 hover:border-blue-400 hover:bg-blue-50 uppercase tracking-wide"
+                className="group relative flex items-center gap-2 text-xs font-medium transition-all border px-4 py-2 bg-zinc-900 text-zinc-400 border-zinc-700 hover:text-blue-400 hover:border-blue-500/50 hover:bg-blue-950/20 uppercase tracking-wide"
                 title="Download Analysis Report (.md)"
               >
-                <CornerAccents color="border-gray-400 group-hover:border-blue-400" size="w-1 h-1"/>
+                <CornerAccents color="border-zinc-700 group-hover:border-blue-500/50" size="w-1 h-1"/>
                 <Download size={14} />
                 EXPORT REPORT
               </button>
@@ -211,46 +211,46 @@ export const JsonDisplay: React.FC<JsonDisplayProps> = ({ data }) => {
 
       <div className="flex items-center gap-2">
         <div className="w-1 h-4 bg-blue-600"></div>
-        <h1 className="text-lg font-bold text-gray-400 uppercase tracking-widest">Analysis Result</h1>
+        <h1 className="text-lg font-bold text-zinc-500 uppercase tracking-widest">Analysis Result</h1>
       </div>
 
       <section className="relative">
-        <h3 className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-2">Core Hypothesis</h3>
-        <div className="bg-white border-l-2 border-gray-200 pl-4 py-2 text-gray-800 leading-relaxed text-sm md:text-base">
+        <h3 className="text-xs font-bold uppercase tracking-widest text-zinc-600 mb-2">Core Hypothesis</h3>
+        <div className="bg-zinc-900/50 border-l-2 border-zinc-700 pl-4 py-2 text-zinc-200 leading-relaxed text-sm md:text-base">
           {data.core_hypothesis}
         </div>
       </section>
 
       <section>
-        <h3 className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-4">Methodology</h3>
-        <p className="text-gray-700 leading-relaxed mb-8 border-l-2 border-transparent pl-4">
+        <h3 className="text-xs font-bold uppercase tracking-widest text-zinc-600 mb-4">Methodology</h3>
+        <p className="text-zinc-400 leading-relaxed mb-8 border-l-2 border-transparent pl-4">
           {data.methodology_summary}
         </p>
         
         {data.methodology_steps && data.methodology_steps.length > 0 && (
           <div className="relative pl-2">
-            <div className="absolute top-0 bottom-0 left-[19px] w-px bg-gray-200"></div>
+            <div className="absolute top-0 bottom-0 left-[19px] w-px bg-zinc-800"></div>
             
             <div className="space-y-8">
               {data.methodology_steps.map((stage, index) => (
                 <div key={index} className="relative flex gap-6 group">
                   {/* Phase Icon - Square now */}
-                  <div className="flex-shrink-0 w-10 h-10 bg-white border border-blue-200 text-blue-500 flex items-center justify-center z-10 shadow-sm group-hover:border-blue-500 group-hover:text-blue-600 transition-all">
+                  <div className="flex-shrink-0 w-10 h-10 bg-zinc-900 border border-zinc-700 text-blue-500 flex items-center justify-center z-10 shadow-sm group-hover:border-blue-500/50 group-hover:text-blue-400 transition-all">
                     {getPhaseIcon(stage.stage_name)}
                   </div>
                   
                   {/* Phase Content */}
                   <div className="flex-1 pt-1">
-                    <h4 className="text-sm font-bold text-gray-900 mb-3 uppercase tracking-wide flex items-center gap-2">
-                      <span className="text-blue-400 font-mono text-xs">0{index + 1}</span>
+                    <h4 className="text-sm font-bold text-zinc-200 mb-3 uppercase tracking-wide flex items-center gap-2">
+                      <span className="text-blue-500 font-mono text-xs">0{index + 1}</span>
                       {stage.stage_name}
                     </h4>
-                    <div className="relative bg-white border border-gray-200 p-5 shadow-[0_2px_15px_-3px_rgba(0,0,0,0.03)] hover:border-blue-300 transition-colors">
-                      <CornerAccents color="border-gray-200 group-hover:border-blue-300" />
+                    <div className="relative bg-zinc-900/30 border border-zinc-800 p-5 hover:border-blue-900 transition-colors">
+                      <CornerAccents color="border-zinc-800 group-hover:border-blue-900" />
                       <ul className="space-y-2.5">
                         {stage.steps.map((step, sIdx) => (
-                          <li key={sIdx} className="text-sm text-gray-700 leading-snug flex gap-3 items-start">
-                             <div className="w-1 h-1 bg-blue-400 mt-2 shrink-0"></div>
+                          <li key={sIdx} className="text-sm text-zinc-400 leading-snug flex gap-3 items-start">
+                             <div className="w-1 h-1 bg-blue-500 mt-2 shrink-0"></div>
                              <span>{step}</span>
                           </li>
                         ))}
@@ -265,16 +265,16 @@ export const JsonDisplay: React.FC<JsonDisplayProps> = ({ data }) => {
       </section>
 
       <section>
-        <h3 className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-4">Key Results</h3>
-        <div className="border border-gray-200 bg-white p-6 relative">
+        <h3 className="text-xs font-bold uppercase tracking-widest text-zinc-600 mb-4">Key Results</h3>
+        <div className="border border-zinc-800 bg-zinc-900/30 p-6 relative">
           <CornerAccents />
           <ul className="space-y-3">
             {data.key_results.map((result, idx) => (
               <li key={idx} className="flex gap-4">
-                <span className="flex-shrink-0 w-6 h-6 bg-blue-50 border border-blue-100 text-blue-600 flex items-center justify-center text-xs font-mono font-bold mt-0.5">
+                <span className="flex-shrink-0 w-6 h-6 bg-blue-950/20 border border-blue-900 text-blue-400 flex items-center justify-center text-xs font-mono font-bold mt-0.5">
                   {idx + 1}
                 </span>
-                <span className="text-gray-700 leading-relaxed">{result}</span>
+                <span className="text-zinc-300 leading-relaxed">{result}</span>
               </li>
             ))}
           </ul>
@@ -282,31 +282,31 @@ export const JsonDisplay: React.FC<JsonDisplayProps> = ({ data }) => {
       </section>
 
       <section className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="relative border border-gray-200 bg-white p-5">
+        <div className="relative border border-zinc-800 bg-zinc-900/30 p-5">
           <CornerAccents />
-          <h3 className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-3 flex items-center gap-2">
-            <span className="w-1 h-1 bg-gray-400"></span> Conclusions
+          <h3 className="text-xs font-bold uppercase tracking-widest text-zinc-600 mb-3 flex items-center gap-2">
+            <span className="w-1 h-1 bg-zinc-600"></span> Conclusions
           </h3>
-          <p className="text-gray-700 text-sm leading-relaxed">{data.conclusions}</p>
+          <p className="text-zinc-300 text-sm leading-relaxed">{data.conclusions}</p>
         </div>
-        <div className="relative border border-gray-200 bg-white p-5">
+        <div className="relative border border-zinc-800 bg-zinc-900/30 p-5">
            <CornerAccents />
-          <h3 className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-3 flex items-center gap-2">
-            <span className="w-1 h-1 bg-gray-400"></span> Limitations
+          <h3 className="text-xs font-bold uppercase tracking-widest text-zinc-600 mb-3 flex items-center gap-2">
+            <span className="w-1 h-1 bg-zinc-600"></span> Limitations
           </h3>
-          <p className="text-gray-700 text-sm italic text-gray-500 leading-relaxed">
+          <p className="text-sm italic text-zinc-500 leading-relaxed">
             {data.limitations}
           </p>
         </div>
       </section>
 
       <section>
-        <h3 className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-4">Figures & Data Visualization</h3>
+        <h3 className="text-xs font-bold uppercase tracking-widest text-zinc-600 mb-4">Figures & Data Visualization</h3>
         <div className="grid grid-cols-1 gap-6">
           {(data.figures_data as any[]).map((fig: FigureData | string, idx: number) => {
              if (typeof fig === 'string') {
                  return (
-                    <div key={idx} className="border border-gray-200 p-3 text-sm text-gray-600 font-mono">
+                    <div key={idx} className="border border-zinc-800 p-3 text-sm text-zinc-500 font-mono">
                         {fig}
                     </div>
                  )
@@ -320,36 +320,36 @@ export const JsonDisplay: React.FC<JsonDisplayProps> = ({ data }) => {
              const isDiagram = typeLower.includes('diagram') || typeLower.includes('schematic') || typeLower.includes('illustration') || typeLower.includes('mechanism') || typeLower.includes('model') || typeLower.includes('flow');
 
              let IconComponent = ImageIcon;
-             let iconStyles = "bg-purple-50 text-purple-600 border-purple-200";
-             let badgeStyles = "text-purple-700 border-purple-200 bg-purple-50";
+             let iconStyles = "bg-purple-950/20 text-purple-400 border-purple-900/50";
+             let badgeStyles = "text-purple-400 border-purple-900/50 bg-purple-950/20";
              
              if (isMicrograph) {
                  IconComponent = Microscope;
-                 iconStyles = "bg-emerald-50 text-emerald-600 border-emerald-200";
-                 badgeStyles = "text-emerald-700 border-emerald-200 bg-emerald-50";
+                 iconStyles = "bg-emerald-950/20 text-emerald-400 border-emerald-900/50";
+                 badgeStyles = "text-emerald-400 border-emerald-900/50 bg-emerald-950/20";
              } else if (isChart) {
                  IconComponent = LineChart;
-                 iconStyles = "bg-blue-50 text-blue-600 border-blue-200";
-                 badgeStyles = "text-blue-700 border-blue-200 bg-blue-50";
+                 iconStyles = "bg-blue-950/20 text-blue-400 border-blue-900/50";
+                 badgeStyles = "text-blue-400 border-blue-900/50 bg-blue-950/20";
              } else if (isDiagram) {
                  IconComponent = Workflow;
-                 iconStyles = "bg-orange-50 text-orange-600 border-orange-200";
-                 badgeStyles = "text-orange-700 border-orange-200 bg-orange-50";
+                 iconStyles = "bg-orange-950/20 text-orange-400 border-orange-900/50";
+                 badgeStyles = "text-orange-400 border-orange-900/50 bg-orange-950/20";
              }
 
              return (
-                <div key={idx} className="group relative bg-white border border-gray-200 p-6 transition-all duration-200 hover:border-gray-300">
-                    <CornerAccents color="border-gray-200 group-hover:border-gray-400" />
+                <div key={idx} className="group relative bg-zinc-900/30 border border-zinc-800 p-6 transition-all duration-200 hover:border-zinc-600">
+                    <CornerAccents color="border-zinc-800 group-hover:border-zinc-600" />
                     <div className="flex flex-col sm:flex-row justify-between items-start gap-4 mb-6">
                         <div className="flex items-start gap-4">
                            <div className={`p-2.5 shrink-0 border ${iconStyles}`}>
                              <IconComponent size={20} />
                            </div>
                            <div className="space-y-1">
-                              <h4 className="font-semibold text-gray-900 text-base leading-tight font-mono uppercase">
+                              <h4 className="font-semibold text-zinc-200 text-base leading-tight font-mono uppercase">
                                 {fig.caption || `Figure ${idx + 1}`}
                               </h4>
-                              <p className="text-xs text-gray-500 font-normal leading-normal uppercase tracking-wide">
+                              <p className="text-xs text-zinc-500 font-normal leading-normal uppercase tracking-wide">
                                 {fig.purpose}
                               </p>
                            </div>
@@ -362,20 +362,20 @@ export const JsonDisplay: React.FC<JsonDisplayProps> = ({ data }) => {
                     <div className="pl-0 sm:pl-14">
                       <div className="mb-4">
                          <div className="flex items-center gap-2 mb-2">
-                            <ScanEye size={14} className="text-gray-400" />
-                            <span className="text-[10px] font-bold uppercase text-gray-400 tracking-widest">Findings</span>
+                            <ScanEye size={14} className="text-zinc-600" />
+                            <span className="text-[10px] font-bold uppercase text-zinc-600 tracking-widest">Findings</span>
                          </div>
                          {Array.isArray(fig.findings) ? (
                             <ul className="space-y-1.5">
                               {fig.findings.map((finding: string, fIdx: number) => (
-                                <li key={fIdx} className="text-sm text-gray-700 flex gap-2 items-start">
-                                  <ArrowRight size={14} className="mt-1 text-gray-300 shrink-0" />
+                                <li key={fIdx} className="text-sm text-zinc-400 flex gap-2 items-start">
+                                  <ArrowRight size={14} className="mt-1 text-zinc-700 shrink-0" />
                                   <span>{finding}</span>
                                 </li>
                               ))}
                             </ul>
                          ) : (
-                            <p className="text-sm text-gray-700 leading-relaxed">{(fig as any).observation || (fig as any).findings}</p>
+                            <p className="text-sm text-zinc-400 leading-relaxed">{(fig as any).observation || (fig as any).findings}</p>
                          )}
                       </div>
                       
@@ -387,9 +387,9 @@ export const JsonDisplay: React.FC<JsonDisplayProps> = ({ data }) => {
         </div>
       </section>
 
-      <div className="mt-8 pt-6 border-t border-gray-200">
-        <h3 className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-3">Raw Data Stream</h3>
-        <pre className="bg-gray-50 border border-gray-200 text-gray-600 p-4 overflow-x-auto text-[10px] font-mono leading-tight">
+      <div className="mt-8 pt-6 border-t border-zinc-800">
+        <h3 className="text-xs font-bold uppercase tracking-widest text-zinc-600 mb-3">Raw Data Stream</h3>
+        <pre className="bg-black/50 border border-zinc-800 text-zinc-500 p-4 overflow-x-auto text-[10px] font-mono leading-tight">
           {JSON.stringify(data, null, 2)}
         </pre>
       </div>
