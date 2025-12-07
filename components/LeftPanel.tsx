@@ -159,7 +159,7 @@ export const LeftPanel: React.FC<LeftPanelProps> = ({
             <a 
               href="/assets/sample-research-paper.pdf" 
               download 
-              className="text-[10px] text-zinc-400 hover:text-blue-500 dark:text-zinc-600 dark:hover:text-blue-400 flex items-center gap-1.5 transition-colors uppercase tracking-wider font-mono cursor-pointer"
+              className="text-[10px] text-zinc-400 hover:text-blue-500 dark:text-zinc-600 dark:hover:text-blue-400 flex items-center gap-1.5 transition-colors uppercase tracking-wider font-mono cursor-pointer border-b border-dashed border-transparent hover:border-blue-500 dark:hover:border-blue-400 pb-0.5"
             >
               <Download size={10} />
               Download Sample PDF
@@ -179,7 +179,7 @@ export const LeftPanel: React.FC<LeftPanelProps> = ({
               href="https://mantha.vercel.app/?utm_source=scientific-paper-analyzer" 
               target="_blank" 
               rel="noopener noreferrer"
-              className="text-zinc-500 dark:text-zinc-400 border-b border-dashed border-zinc-400 dark:border-zinc-500 hover:text-blue-600 dark:hover:text-blue-400 hover:border-blue-600 dark:hover:border-blue-400 transition-colors pb-0.5"
+              className="text-zinc-500 dark:text-zinc-500 border-b border-dashed border-transparent hover:text-blue-600 dark:hover:text-blue-400 hover:border-blue-600 dark:hover:border-blue-400 transition-colors pb-0.5"
             >
               mantha
             </a>
@@ -262,7 +262,7 @@ export const LeftPanel: React.FC<LeftPanelProps> = ({
          {selectedFiles.length > 0 && !isAnalyzing && (
              <button
                 onClick={handleAnalyzeFiles}
-                className="w-full relative py-3 bg-blue-600 hover:bg-blue-500 text-white uppercase tracking-widest text-xs font-bold transition-all group overflow-hidden"
+                className="w-full relative py-3 bg-blue-600 hover:bg-blue-500 text-white uppercase tracking-widest text-xs font-bold transition-all group overflow-hidden leading-none"
              >
                 <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20"></div>
                 <CornerAccents className="border-blue-300 group-hover:border-white" size="w-1 h-1" />
@@ -277,7 +277,7 @@ export const LeftPanel: React.FC<LeftPanelProps> = ({
          {isAnalyzing && (
              <button
                 onClick={handleCancelAnalysis}
-                className="w-full relative py-3 bg-red-600 hover:bg-red-500 text-white uppercase tracking-widest text-xs font-bold transition-all group overflow-hidden animate-in fade-in"
+                className="w-full relative py-3 bg-red-600 hover:bg-red-500 text-white uppercase tracking-widest text-xs font-bold transition-all group overflow-hidden animate-in fade-in leading-none"
              >
                 <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20"></div>
                 <CornerAccents className="border-red-300 group-hover:border-white" size="w-1 h-1" />
