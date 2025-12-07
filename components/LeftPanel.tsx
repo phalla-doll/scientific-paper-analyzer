@@ -106,8 +106,8 @@ export const LeftPanel: React.FC<LeftPanelProps> = ({
                 ${msg.role === 'user' 
                     ? 'bg-zinc-100 border-zinc-200 text-zinc-800 dark:bg-zinc-800/50 dark:border-zinc-700 dark:text-zinc-200 p-3' 
                     : msg.role === 'assistant'
-                    ? 'bg-blue-50 border-blue-100 text-zinc-800 dark:bg-blue-950/20 dark:border-blue-900/50 dark:text-blue-100 p-3'
-                    : 'bg-transparent border-transparent text-zinc-500 font-mono text-xs px-3 py-2.5'
+                    ? 'bg-blue-50 border-blue-100 text-zinc-800 dark:bg-blue-950/20 dark:border-blue-900/50 dark:text-blue-100 py-2.5 px-3'
+                    : 'bg-transparent border-transparent text-zinc-500 font-mono text-xs py-2.5 px-3'
                 }`}
                 >
                   {msg.role !== 'system' && (
@@ -136,18 +136,18 @@ export const LeftPanel: React.FC<LeftPanelProps> = ({
                 handleInputSubmit();
               }
             }}
-            placeholder={isChatting ? "Ask a question about this paper..." : "Paste text abstract or hypothesis..."}
+            placeholder={isComplete ? "Ask a question about this paper..." : "Paste text abstract or hypothesis..."}
             className="w-full bg-zinc-50 border border-zinc-200 text-zinc-800 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 dark:bg-zinc-950 dark:border-zinc-800 dark:text-zinc-200 dark:focus:border-blue-600 min-h-[80px] p-3 pr-12 text-sm resize-none custom-scrollbar placeholder:text-zinc-400 dark:placeholder:text-zinc-600 transition-colors"
             disabled={isAnalyzing}
           />
           
           <button 
             onClick={handleInputSubmit}
-            disabled={!inputText.trim() || (isAnalyzing && !isChatting)}
+            disabled={!inputText.trim() || isAnalyzing || isChatting}
             className="absolute bottom-3 right-3 p-2 bg-blue-600 text-white hover:bg-blue-500 disabled:opacity-50 disabled:hover:bg-blue-600 transition-colors group"
           >
             <CornerAccents className="border-blue-300 group-hover:border-white" size="w-0.5 h-0.5" />
-            {isChatting ? <Send size={16} /> : <ArrowRight size={16} />}
+            {isComplete ? <Send size={16} /> : <ArrowRight size={16} />}
           </button>
         </div>
 
@@ -171,7 +171,7 @@ export const LeftPanel: React.FC<LeftPanelProps> = ({
              <Cpu size={10} />
              <span>System v3.0.4</span>
           </div>
-          <div className="flex items-center gap-1">
+          <div className="flex items-baseline gap-1">
             <span>Made with Gemini-3 by </span>
             <a 
               href="https://mantha.vercel.app/?utm_source=scientific-paper-analyzer" 
@@ -281,7 +281,7 @@ export const LeftPanel: React.FC<LeftPanelProps> = ({
                 <CornerAccents className="border-red-300 group-hover:border-white" size="w-1 h-1" />
                 <span className="relative flex items-center justify-center gap-2 leading-none">
                    <Square size={14} fill="currentColor" /> 
-                   <span>Cancel Process</span>
+                   <span className="mt-0.5">Cancel Process</span>
                 </span>
              </button>
          )}

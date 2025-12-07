@@ -460,15 +460,15 @@ export const JsonDisplay = forwardRef<JsonDisplayRef, JsonDisplayProps>(({ data 
         <div className="bg-white dark:bg-zinc-900/30 border border-zinc-200 dark:border-zinc-800 p-5 text-zinc-700 dark:text-zinc-300 text-sm leading-relaxed relative hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors">
             <CornerAccents className="border-zinc-300 dark:border-zinc-700" />
             <p>
-                <span className="text-blue-600 dark:text-blue-400 font-bold uppercase text-[10px] tracking-wider mr-2">Hypothesis</span> 
+                <span className="text-blue-600 dark:text-blue-400 font-bold uppercase text-sm tracking-wide mr-2">Hypothesis</span> 
                 {data.core_hypothesis}
             </p>
             <p className="mt-3">
-                <span className="text-blue-600 dark:text-blue-400 font-bold uppercase text-[10px] tracking-wider mr-2">Key Findings</span> 
+                <span className="text-blue-600 dark:text-blue-400 font-bold uppercase text-sm tracking-wide mr-2">Key Findings</span> 
                 {data.key_results.join('; ')}
             </p>
             <p className="mt-3">
-                <span className="text-blue-600 dark:text-blue-400 font-bold uppercase text-[10px] tracking-wider mr-2">Conclusion</span> 
+                <span className="text-blue-600 dark:text-blue-400 font-bold uppercase text-sm tracking-wide mr-2">Conclusion</span> 
                 {data.conclusions}
             </p>
         </div>
