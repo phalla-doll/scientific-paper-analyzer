@@ -1,0 +1,5 @@
+{
+  "name": "Scientific Paper Analyzer",
+  "description": "A multimodal research assistant that analyzes PDF academic papers to extract structured data, hypotheses, and figure interpretations.",
+  "requestFramePermissions": []
+}
