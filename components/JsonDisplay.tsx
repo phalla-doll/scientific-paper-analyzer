@@ -97,7 +97,8 @@ export const JsonDisplay = forwardRef<JsonDisplayRef, JsonDisplayProps>(({ data 
                 mdContent += `\n**Extracted Data:**\n`;
                 
                 // Generate ASCII Bar Chart for Markdown
-                const maxVal = Math.max(...fig.data_points.map((p: any) => p.value));
+                const values = fig.data_points.map((p: any) => p.value);
+                const maxVal = Math.max(...values, 0) || 1;
                 const maxLabelWidth = Math.max(...fig.data_points.map((p: any) => p.label.length), 10);
                 
                 mdContent += "```text\n";
@@ -134,26 +135,60 @@ export const JsonDisplay = forwardRef<JsonDisplayRef, JsonDisplayProps>(({ data 
     const validPoints = points.filter(p => typeof p.value === 'number');
     if (validPoints.length === 0) return null;
 
-    // Find max value for scaling
-    const maxValue = Math.max(...validPoints.map(p => p.value));
-    const maxBarChars = 20;
+    // Analysis for scale selection
+    const values = validPoints.map(p => p.value);
+    const maxValue = Math.max(...values);
+    const minValue = Math.min(...values);
+    const positives = values.filter(v => v > 0);
+    const minPositive = positives.length > 0 ? Math.min(...positives) : 0.0001;
+
+    // Use log scale if dynamic range > 1000 and values are positive
+    const rangeRatio = minPositive > 0 ? maxValue / minPositive : 0;
+    const useLogScale = minValue >= 0 && rangeRatio > 1000;
+    
+    const maxBarChars = 24;
     
     return (
       <div className="mt-5 pt-4 border-t border-dashed border-zinc-800/50">
-        <h4 className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-3 flex items-center gap-1.5">
-          <Activity size={12} className="text-blue-500" /> 
-          Data Distribution
-        </h4>
+        <div className="flex items-center justify-between mb-3">
+            <h4 className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider flex items-center gap-1.5">
+            <Activity size={12} className="text-blue-500" /> 
+            Data Distribution
+            </h4>
+            {useLogScale && (
+                <span className="text-[9px] font-mono text-blue-400 border border-blue-900/50 px-1.5 py-0.5 bg-blue-950/20">
+                    LOG SCALE
+                </span>
+            )}
+        </div>
         
         <div className="font-mono text-xs bg-zinc-950/50 p-4 border border-zinc-800/80 relative">
           <CornerAccents className="border-zinc-700" size="w-1 h-1" />
           
           <div className="space-y-1">
             {validPoints.map((p, idx) => {
-              const filledCount = Math.max(0, Math.round((p.value / maxValue) * maxBarChars));
-              const emptyCount = Math.max(0, maxBarChars - filledCount);
+              let ratio = 0;
+              
+              if (useLogScale && p.value > 0) {
+                 const logMin = Math.log10(minPositive);
+                 const logMax = Math.log10(maxValue);
+                 const logVal = Math.log10(p.value);
+                 // Normalize log value between 0 and 1
+                 // If max == min (single point or uniform), ratio is 1
+                 const norm = logMax === logMin ? 1 : (logVal - logMin) / (logMax - logMin);
+                 // Apply a floor so minimum positive value has at least 1 block visibility relative to max
+                 ratio = 0.1 + (0.9 * norm); 
+              } else {
+                 ratio = maxValue !== 0 ? p.value / maxValue : 0;
+              }
+
+              // Ensure ratio stays within bounds [0, 1]
+              ratio = Math.max(0, Math.min(1, ratio));
+
+              const filledCount = Math.round(ratio * maxBarChars);
+              const emptyCount = maxBarChars - filledCount;
               const filled = '█'.repeat(filledCount);
-              const empty = '░'.repeat(emptyCount);
+              const empty = '░'.repeat(Math.max(0, emptyCount));
 
               return (
                 <div key={idx} className="flex items-center gap-3 hover:bg-zinc-900 py-0.5 transition-colors group">
@@ -182,9 +217,18 @@ export const JsonDisplay = forwardRef<JsonDisplayRef, JsonDisplayProps>(({ data 
           <div className="flex items-center gap-3 mt-2 text-[9px] text-zinc-600 font-mono">
             <div className="w-24 shrink-0 pr-3 text-right opacity-0">Labels</div> {/* Spacer */}
             <div className="flex justify-between w-[20ch] tracking-tighter px-[1px]">
-               <span>0</span>
-               <span>{Math.round(maxValue / 2)}</span>
-               <span>{maxValue}</span>
+               <span>
+                  {useLogScale ? minPositive.toExponential(0) : 0}
+               </span>
+               <span className="opacity-50">
+                  {useLogScale 
+                    ? Math.pow(10, (Math.log10(minPositive) + Math.log10(maxValue)) / 2).toExponential(0)
+                    : Math.round(maxValue / 2)
+                  }
+               </span>
+               <span>
+                  {useLogScale ? maxValue.toExponential(0) : maxValue}
+               </span>
             </div>
           </div>
         </div>
