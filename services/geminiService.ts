@@ -1,7 +1,9 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { PaperAnalysis, Message } from "../types";
 
-const API_KEY = process.env.API_KEY || '';
+// Retrieve API Key from process.env (injected via vite.config.ts define) 
+// or fallback to standard Vite env var (VITE_API_KEY)
+const API_KEY = process.env.API_KEY || (import.meta as any).env?.VITE_API_KEY || '';
 
 const ai = new GoogleGenAI({ apiKey: API_KEY });
 
@@ -68,7 +70,7 @@ const RESPONSE_SCHEMA = {
 
 export const analyzePaper = async (content: { images?: string[], text?: string }): Promise<PaperAnalysis> => {
   if (!API_KEY) {
-    throw new Error("API Key is missing.");
+    throw new Error("API Key is missing. Please check your Vercel Environment Variables (API_KEY or VITE_API_KEY).");
   }
 
   const parts: any[] = [];
