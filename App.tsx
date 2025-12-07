@@ -164,6 +164,7 @@ const App: React.FC = () => {
       try {
         const response = await chatWithPaper(analysis, userQuery, messages);
         addMessage('assistant', response);
+        trackEvent('chat_response_received', { response_length: response.length });
       } catch (error: any) {
         addMessage('assistant', `Error: ${error.message}`);
         trackEvent('chat_error', { message: error.message });
@@ -203,7 +204,7 @@ const App: React.FC = () => {
       setAnalysis(result);
       setAppState(AppState.COMPLETE);
       addMessage('assistant', 'Analysis complete. You can now ask questions about the paper below.');
-      trackEvent('analyze_text_completed', { success: true });
+      trackEvent('analyze_text_completed', { success: true, paper_title: result.paper_title });
     } catch (error: any) {
       if (analysisIdRef.current !== currentId) return;
       console.error(error);
@@ -266,7 +267,7 @@ const App: React.FC = () => {
       addMessage('assistant', 'Analysis complete. Structured data extracted.');
       addMessage('assistant', 'System is ready for Q&A. Type below to query the documents.');
       
-      trackEvent('analyze_pdf_completed', { page_count: images.length });
+      trackEvent('analyze_pdf_completed', { page_count: images.length, paper_title: result.paper_title });
 
     } catch (error: any) {
       if (analysisIdRef.current !== currentId) return;
