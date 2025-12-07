@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Upload, Bot, AlertCircle, CheckCircle2, Sparkles, Send, RefreshCw, MessageSquare, FileText, X, Plus, Play, Download } from 'lucide-react';
+import { Upload, Bot, AlertCircle, CheckCircle2, Sparkles, Send, RefreshCw, MessageSquare, FileText, X, Plus, Play, Download, Square } from 'lucide-react';
 import { JsonDisplay } from './components/JsonDisplay';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { convertPdfToImages } from './utils/pdfUtils';
@@ -131,6 +131,10 @@ const App: React.FC = () => {
   
   const fileInputRef = useRef<HTMLInputElement>(null);
   const chatEndRef = useRef<HTMLDivElement>(null);
+  
+  // Ref to track the current analysis session ID. 
+  // If the user cancels, we increment this to ignore results from the stale promise.
+  const analysisIdRef = useRef<number>(0);
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -175,6 +179,9 @@ const App: React.FC = () => {
   const handleTextAnalyze = async () => {
     if (!inputText.trim()) return;
 
+    const currentId = Date.now();
+    analysisIdRef.current = currentId;
+
     const textToAnalyze = inputText;
     trackEvent('analyze_text_submitted', { text_length: textToAnalyze.length });
 
@@ -190,11 +197,15 @@ const App: React.FC = () => {
     try {
       const result = await analyzePaper({ text: textToAnalyze });
       
+      // Guard: Check if this process is still active (not cancelled/superseded)
+      if (analysisIdRef.current !== currentId) return;
+
       setAnalysis(result);
       setAppState(AppState.COMPLETE);
       addMessage('assistant', 'Analysis complete. You can now ask questions about the paper below.');
       trackEvent('analyze_text_completed', { success: true });
     } catch (error: any) {
+      if (analysisIdRef.current !== currentId) return;
       console.error(error);
       setAppState(AppState.ERROR);
       addMessage('assistant', `Error processing text: ${error.message || 'Unknown error'}`);
@@ -226,6 +237,9 @@ const App: React.FC = () => {
   const handleAnalyzeFiles = async () => {
     if (selectedFiles.length === 0) return;
 
+    const currentId = Date.now();
+    analysisIdRef.current = currentId;
+
     setAppState(AppState.PROCESSING_PDF);
     const fileNames = selectedFiles.map(f => f.name).join(', ');
     addMessage('user', `Uploaded ${selectedFiles.length} document(s): ${fileNames}`);
@@ -235,12 +249,17 @@ const App: React.FC = () => {
     try {
       // Convert all PDFs to images in parallel
       const allImagesArrays = await Promise.all(selectedFiles.map(f => convertPdfToImages(f)));
+      
+      if (analysisIdRef.current !== currentId) return;
+
       const images = allImagesArrays.flat();
       
       setAppState(AppState.ANALYZING);
       addMessage('assistant', `Derendering documents (${images.length} total pages) and interpreting visuals...`);
       
       const result = await analyzePaper({ images });
+      
+      if (analysisIdRef.current !== currentId) return;
       
       setAnalysis(result);
       setAppState(AppState.COMPLETE);
@@ -250,6 +269,7 @@ const App: React.FC = () => {
       trackEvent('analyze_pdf_completed', { page_count: images.length });
 
     } catch (error: any) {
+      if (analysisIdRef.current !== currentId) return;
       console.error(error);
       setAppState(AppState.ERROR);
       addMessage('assistant', `Error processing documents: ${error.message || 'Unknown error'}`);
@@ -257,11 +277,22 @@ const App: React.FC = () => {
     }
   };
 
+  const handleCancelAnalysis = () => {
+    // Invalidate the current analysis ID
+    analysisIdRef.current = 0;
+    
+    setAppState(AppState.IDLE);
+    setAnalysis(null);
+    addMessage('system', 'Analysis process cancelled by user.');
+    trackEvent('analysis_cancelled');
+  };
+
   const handleReset = () => {
     trackEvent('app_reset');
     setAnalysis(null);
     setSelectedFiles([]);
     setAppState(AppState.IDLE);
+    analysisIdRef.current = 0;
     setMessages([{
       id: 'reset',
       role: 'system',
@@ -272,6 +303,7 @@ const App: React.FC = () => {
 
   const isIdle = appState === AppState.IDLE || appState === AppState.ERROR;
   const isComplete = appState === AppState.COMPLETE;
+  const isAnalyzing = appState === AppState.PROCESSING_PDF || appState === AppState.ANALYZING;
 
   const getHeaderText = () => {
     if (!analysis) return 'System Ready';
@@ -369,13 +401,13 @@ const App: React.FC = () => {
                     className={`w-full h-24 p-3 pr-10 text-xs font-mono bg-zinc-950 border focus:outline-none resize-none transition-all placeholder:text-zinc-600 text-zinc-300
                         ${isComplete ? 'border-blue-900/50 focus:border-blue-500/50 focus:bg-blue-950/10' : 'border-zinc-800 focus:border-blue-500/50 focus:bg-zinc-950'}
                     `}
-                    disabled={appState === AppState.PROCESSING_PDF || appState === AppState.ANALYZING}
+                    disabled={isAnalyzing}
                 />
                 <CornerAccents className={`transition-colors ${isComplete ? 'border-blue-800' : 'border-zinc-700 group-focus-within:border-blue-500'}`} />
                 
                 <button
                     onClick={handleInputSubmit}
-                    disabled={!inputText.trim() || appState === AppState.PROCESSING_PDF || appState === AppState.ANALYZING}
+                    disabled={!inputText.trim() || isAnalyzing}
                     className={`absolute bottom-3 right-3 p-2 text-white transition-colors
                         ${isComplete ? 'bg-blue-600 hover:bg-blue-500' : 'bg-zinc-700 hover:bg-zinc-600'}
                         disabled:opacity-50 disabled:cursor-not-allowed
@@ -410,6 +442,7 @@ const App: React.FC = () => {
                              onClick={() => handleRemoveFile(idx)}
                              className="text-zinc-600 hover:text-red-400 p-1"
                              title="Remove file"
+                             disabled={isAnalyzing}
                            >
                              <X size={12} />
                            </button>
@@ -451,18 +484,33 @@ const App: React.FC = () => {
                     )}
                     </button>
 
-                    {/* Analyze Button (Only visible if files selected) */}
+                    {/* Analyze Button OR Cancel Button */}
                     {selectedFiles.length > 0 && (
-                      <button
-                        onClick={handleAnalyzeFiles}
-                        className="group flex-1 border border-blue-900/50 bg-blue-600 hover:bg-blue-500 text-white transition-all duration-300 flex items-center justify-center gap-2 relative focus:outline-none h-12"
-                      >
-                         <CornerAccents className="border-blue-400" />
-                         <Play size={14} fill="currentColor" />
-                         <span className="text-xs font-bold uppercase tracking-widest">
-                           Analyze {selectedFiles.length > 1 ? `(${selectedFiles.length})` : ''}
-                         </span>
-                      </button>
+                      isAnalyzing ? (
+                        <button
+                          onClick={handleCancelAnalysis}
+                          className="group flex-1 border border-red-900/50 bg-red-600 hover:bg-red-500 text-white transition-all duration-300 flex items-center justify-center gap-2 relative focus:outline-none h-12"
+                          title="Cancel Analysis"
+                        >
+                           <CornerAccents className="border-red-400" />
+                           <Square size={14} fill="currentColor" />
+                           <span className="text-xs font-bold uppercase tracking-widest">
+                             Cancel
+                           </span>
+                        </button>
+                      ) : (
+                        <button
+                          onClick={handleAnalyzeFiles}
+                          className="group flex-1 border border-blue-900/50 bg-blue-600 hover:bg-blue-500 text-white transition-all duration-300 flex items-center justify-center gap-2 relative focus:outline-none h-12"
+                          title="Start Analysis"
+                        >
+                           <CornerAccents className="border-blue-400" />
+                           <Play size={14} fill="currentColor" />
+                           <span className="text-xs font-bold uppercase tracking-widest">
+                             Analyze {selectedFiles.length > 1 ? `(${selectedFiles.length})` : ''}
+                           </span>
+                        </button>
+                      )
                     )}
                 </div>
 

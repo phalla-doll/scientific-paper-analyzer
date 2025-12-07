@@ -231,7 +231,7 @@ export const JsonDisplay: React.FC<JsonDisplayProps> = ({ data }) => {
   return (
     <div className="space-y-8 font-sans text-zinc-300 tracking-wide">
       <div className="border-b border-zinc-800 pb-4">
-        <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <h2 className="text-xl font-bold tracking-tight uppercase text-zinc-100">{data.paper_title}</h2>
             
             <div className="flex items-center gap-2 shrink-0">
@@ -266,37 +266,6 @@ export const JsonDisplay: React.FC<JsonDisplayProps> = ({ data }) => {
         <div className="w-1 h-4 bg-blue-600"></div>
         <h1 className="text-lg font-bold text-zinc-500 uppercase tracking-widest">Analysis Result</h1>
       </div>
-
-      <section className="relative mt-2 mb-6">
-        <div className="flex items-center justify-between mb-2">
-            <h3 className="text-xs font-bold uppercase tracking-widest text-zinc-600 flex items-center gap-2">
-                <FileText size={14} /> Executive Summary
-            </h3>
-            <button 
-                onClick={handleCopySummary}
-                className="group flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-zinc-600 hover:text-blue-400 transition-colors"
-                title="Copy Summary"
-            >
-                {summaryCopied ? <Check size={12} className="text-emerald-500" /> : <Copy size={12} />}
-                <span className={summaryCopied ? "text-emerald-500" : ""}>{summaryCopied ? "COPIED" : "COPY"}</span>
-            </button>
-        </div>
-        <div className="bg-zinc-900/30 border border-zinc-800 p-5 text-zinc-300 text-sm leading-relaxed relative hover:border-zinc-700 transition-colors">
-            <CornerAccents color="border-zinc-700" />
-            <p>
-                <span className="text-blue-400 font-bold uppercase text-[10px] tracking-wider mr-2">Hypothesis</span> 
-                {data.core_hypothesis}
-            </p>
-            <p className="mt-3">
-                <span className="text-blue-400 font-bold uppercase text-[10px] tracking-wider mr-2">Key Findings</span> 
-                {data.key_results.join('; ')}
-            </p>
-            <p className="mt-3">
-                <span className="text-blue-400 font-bold uppercase text-[10px] tracking-wider mr-2">Conclusion</span> 
-                {data.conclusions}
-            </p>
-        </div>
-      </section>
 
       <section className="relative">
         <h3 className="text-xs font-bold uppercase tracking-widest text-zinc-600 mb-2">Core Hypothesis Detail</h3>
@@ -468,6 +437,37 @@ export const JsonDisplay: React.FC<JsonDisplayProps> = ({ data }) => {
                 </div>
              );
           })}
+        </div>
+      </section>
+
+      <section className="relative mt-2 mb-6">
+        <div className="flex items-center justify-between mb-2">
+            <h3 className="text-xs font-bold uppercase tracking-widest text-zinc-600 flex items-center gap-2">
+                <FileText size={14} /> Executive Summary
+            </h3>
+            <button 
+                onClick={handleCopySummary}
+                className="group flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-zinc-600 hover:text-blue-400 transition-colors"
+                title="Copy Summary"
+            >
+                {summaryCopied ? <Check size={12} className="text-emerald-500" /> : <Copy size={12} />}
+                <span className={summaryCopied ? "text-emerald-500" : ""}>{summaryCopied ? "COPIED" : "COPY"}</span>
+            </button>
+        </div>
+        <div className="bg-zinc-900/30 border border-zinc-800 p-5 text-zinc-300 text-sm leading-relaxed relative hover:border-zinc-700 transition-colors">
+            <CornerAccents color="border-zinc-700" />
+            <p>
+                <span className="text-blue-400 font-bold uppercase text-[10px] tracking-wider mr-2">Hypothesis</span> 
+                {data.core_hypothesis}
+            </p>
+            <p className="mt-3">
+                <span className="text-blue-400 font-bold uppercase text-[10px] tracking-wider mr-2">Key Findings</span> 
+                {data.key_results.join('; ')}
+            </p>
+            <p className="mt-3">
+                <span className="text-blue-400 font-bold uppercase text-[10px] tracking-wider mr-2">Conclusion</span> 
+                {data.conclusions}
+            </p>
         </div>
       </section>
 
