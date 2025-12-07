@@ -46,7 +46,7 @@ export const LeftPanel: React.FC<LeftPanelProps> = ({
   const isIdle = appState === AppState.IDLE || appState === AppState.ERROR;
 
   return (
-    <div className="w-1/3 min-w-[350px] max-w-[500px] border-r border-zinc-200 dark:border-zinc-800 flex flex-col bg-white/50 dark:bg-zinc-900/50 h-full z-10 shadow-[4px_0_24px_-4px_rgba(0,0,0,0.1)] dark:shadow-[4px_0_24px_-4px_rgba(0,0,0,0.3)] backdrop-blur-sm transition-colors duration-300">
+    <div className="w-[28%] min-w-[320px] max-w-[450px] border-r border-zinc-200 dark:border-zinc-800 flex flex-col bg-white/50 dark:bg-zinc-900/50 h-full z-10 shadow-[4px_0_24px_-4px_rgba(0,0,0,0.1)] dark:shadow-[4px_0_24px_-4px_rgba(0,0,0,0.3)] backdrop-blur-sm transition-colors duration-300">
       
       {/* Header */}
       <div className="p-6 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between">
@@ -88,7 +88,7 @@ export const LeftPanel: React.FC<LeftPanelProps> = ({
             {messages.map((msg) => (
             <div 
                 key={msg.id} 
-                className={`flex gap-4 items-start animate-in fade-in slide-in-from-bottom-2 duration-300 ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}
+                className={`flex gap-2.5 items-start animate-in fade-in slide-in-from-bottom-2 duration-300 ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}
             >
                 <div className={`w-8 h-8 shrink-0 flex items-center justify-center border relative
                 ${msg.role === 'assistant' 
@@ -102,15 +102,14 @@ export const LeftPanel: React.FC<LeftPanelProps> = ({
                 {msg.role === 'assistant' ? <Bot size={16} /> : msg.role === 'user' ? <MessageSquare size={16} /> : <Bot size={16} className="opacity-50" />}
                 </div>
                 
-                <div className={`flex items-start ${msg.role === 'system' ? 'py-2.5' : ''}`}>
-                  <div className={`flex-1 max-w-[85%] text-sm leading-relaxed border relative
-                  ${msg.role === 'user' 
-                      ? 'bg-zinc-100 border-zinc-200 text-zinc-800 dark:bg-zinc-800/50 dark:border-zinc-700 dark:text-zinc-200 p-3' 
-                      : msg.role === 'assistant'
-                      ? 'bg-blue-50 border-blue-100 text-zinc-800 dark:bg-blue-950/20 dark:border-blue-900/50 dark:text-blue-100 p-3'
-                      : 'bg-transparent border-transparent text-zinc-500 font-mono text-xs px-3'
-                  }`}
-                  >
+                <div className={`max-w-[85%] text-sm leading-relaxed border relative
+                ${msg.role === 'user' 
+                    ? 'bg-zinc-100 border-zinc-200 text-zinc-800 dark:bg-zinc-800/50 dark:border-zinc-700 dark:text-zinc-200 p-3' 
+                    : msg.role === 'assistant'
+                    ? 'bg-blue-50 border-blue-100 text-zinc-800 dark:bg-blue-950/20 dark:border-blue-900/50 dark:text-blue-100 p-3'
+                    : 'bg-transparent border-transparent text-zinc-500 font-mono text-xs px-3 py-2.5'
+                }`}
+                >
                   {msg.role !== 'system' && (
                       <CornerAccents 
                           className={msg.role === 'assistant' ? 'border-blue-200 dark:border-blue-800' : 'border-zinc-300 dark:border-zinc-600'} 
@@ -118,7 +117,6 @@ export const LeftPanel: React.FC<LeftPanelProps> = ({
                       />
                   )}
                   {msg.content}
-                  </div>
                 </div>
             </div>
             ))}
@@ -159,7 +157,7 @@ export const LeftPanel: React.FC<LeftPanelProps> = ({
             <a 
               href="/assets/sample-research-paper.pdf" 
               download 
-              className="text-[10px] text-zinc-400 hover:text-blue-600 dark:text-zinc-500 dark:hover:text-blue-500 flex items-center gap-1.5 transition-colors uppercase tracking-wider font-mono cursor-pointer pb-0.5"
+              className="text-[10px] text-zinc-500 hover:text-blue-600 dark:text-zinc-500 dark:hover:text-blue-500 flex items-center gap-1.5 transition-colors uppercase tracking-wider font-mono cursor-pointer pb-0.5 border-b border-dashed border-transparent hover:border-blue-500 dark:hover:border-blue-400"
             >
               <Download size={10} />
               Download Sample PDF
