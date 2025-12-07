@@ -211,7 +211,7 @@ export const JsonDisplay: React.FC<JsonDisplayProps> = ({ data }) => {
   };
 
   return (
-    <div className="space-y-8 font-sans text-zinc-300">
+    <div className="space-y-8 font-sans text-zinc-300 tracking-wide">
       <div className="border-b border-zinc-800 pb-4">
         <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
             <h2 className="text-xl font-bold tracking-tight uppercase text-zinc-100">{data.paper_title}</h2>

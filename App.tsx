@@ -245,7 +245,7 @@ const App: React.FC = () => {
   const isComplete = appState === AppState.COMPLETE;
 
   return (
-    <div className="flex h-screen w-full bg-[#09090b] text-zinc-200 overflow-hidden font-sans selection:bg-blue-500/30">
+    <div className="flex h-screen w-full bg-[#09090b] text-zinc-200 overflow-hidden font-sans tracking-wide selection:bg-blue-500/30">
       {/* LEFT PANEL */}
       <div className="w-1/3 min-w-[350px] max-w-[500px] border-r border-zinc-800 flex flex-col bg-zinc-900/50 h-full z-10 shadow-[4px_0_24px_-4px_rgba(0,0,0,0.3)]">
         
