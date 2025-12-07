@@ -88,9 +88,9 @@ export const LeftPanel: React.FC<LeftPanelProps> = ({
             {messages.map((msg) => (
             <div 
                 key={msg.id} 
-                className={`flex gap-4 animate-in fade-in slide-in-from-bottom-2 duration-300 ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}
+                className={`flex gap-4 items-start animate-in fade-in slide-in-from-bottom-2 duration-300 ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}
             >
-                <div className={`w-8 h-8 shrink-0 flex items-center justify-center border relative mt-1
+                <div className={`w-8 h-8 shrink-0 flex items-center justify-center border relative
                 ${msg.role === 'assistant' 
                     ? 'bg-blue-600 border-blue-500 text-white shadow-[0_0_10px_rgba(37,99,235,0.3)]' 
                     : msg.role === 'user'
@@ -102,12 +102,12 @@ export const LeftPanel: React.FC<LeftPanelProps> = ({
                 {msg.role === 'assistant' ? <Bot size={16} /> : msg.role === 'user' ? <MessageSquare size={16} /> : <Bot size={16} className="opacity-50" />}
                 </div>
                 
-                <div className={`flex-1 max-w-[85%] text-sm leading-relaxed p-3 border relative
+                <div className={`flex-1 max-w-[85%] text-sm leading-relaxed border relative
                 ${msg.role === 'user' 
-                    ? 'bg-zinc-100 border-zinc-200 text-zinc-800 dark:bg-zinc-800/50 dark:border-zinc-700 dark:text-zinc-200' 
+                    ? 'bg-zinc-100 border-zinc-200 text-zinc-800 dark:bg-zinc-800/50 dark:border-zinc-700 dark:text-zinc-200 p-3' 
                     : msg.role === 'assistant'
-                    ? 'bg-blue-50 border-blue-100 text-zinc-800 dark:bg-blue-950/20 dark:border-blue-900/50 dark:text-blue-100'
-                    : 'bg-transparent border-transparent text-zinc-500 font-mono text-xs'
+                    ? 'bg-blue-50 border-blue-100 text-zinc-800 dark:bg-blue-950/20 dark:border-blue-900/50 dark:text-blue-100 p-3'
+                    : 'bg-transparent border-transparent text-zinc-500 font-mono text-xs py-2.5 px-3'
                 }`}
                 >
                 {msg.role !== 'system' && (
@@ -155,7 +155,7 @@ export const LeftPanel: React.FC<LeftPanelProps> = ({
         {selectedFiles.length === 0 && (
           <div className="mt-2 flex justify-end">
             <a 
-              href="/assets/sample_paper.pdf" 
+              href="/assets/sample-research-paper.pdf" 
               download 
               className="text-[10px] text-zinc-400 hover:text-blue-500 dark:text-zinc-600 dark:hover:text-blue-400 flex items-center gap-1.5 transition-colors uppercase tracking-wider font-mono cursor-pointer"
             >
@@ -192,7 +192,7 @@ export const LeftPanel: React.FC<LeftPanelProps> = ({
                        </div>
                        <button 
                          onClick={() => handleRemoveFile(idx)}
-                         className="text-zinc-400 hover:text-red-500 dark:text-zinc-600 dark:hover:text-red-400 transition-colors"
+                         className="text-zinc-400 hover:text-red-500 dark:text-zinc-600 dark:hover:text-red-400 transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:text-zinc-400 dark:disabled:hover:text-zinc-600"
                          disabled={isAnalyzing}
                        >
                           <X size={14} />
@@ -202,16 +202,16 @@ export const LeftPanel: React.FC<LeftPanelProps> = ({
                
                {/* Add More Files Button (Small) */}
                {selectedFiles.length < 5 && (
-                 <div className="relative group cursor-pointer border border-dashed border-zinc-300 dark:border-zinc-700 hover:border-blue-400 dark:hover:border-blue-600 bg-transparent p-2 flex items-center justify-center transition-colors">
+                 <div className={`relative group border border-dashed border-zinc-300 dark:border-zinc-700 bg-transparent p-2 flex items-center justify-center transition-colors ${isAnalyzing ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer hover:border-blue-400 dark:hover:border-blue-600'}`}>
                     <input 
                         type="file" 
                         accept="application/pdf"
                         multiple
                         onChange={handleFileSelect}
-                        className="absolute inset-0 opacity-0 cursor-pointer"
+                        className="absolute inset-0 opacity-0 cursor-pointer disabled:cursor-not-allowed"
                         disabled={isAnalyzing}
                     />
-                    <Plus size={14} className="text-zinc-400 group-hover:text-blue-500 transition-colors" />
+                    <Plus size={14} className={`text-zinc-400 transition-colors ${!isAnalyzing && 'group-hover:text-blue-500'}`} />
                  </div>
                )}
             </div>
@@ -219,7 +219,7 @@ export const LeftPanel: React.FC<LeftPanelProps> = ({
 
          {/* Main Upload Area (Hidden if files selected) */}
          {selectedFiles.length === 0 && (
-            <div className="relative group cursor-pointer h-32 border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 hover:border-blue-500 dark:hover:border-blue-500 transition-all duration-300 overflow-hidden">
+            <div className={`relative group h-32 border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 transition-all duration-300 overflow-hidden ${isAnalyzing ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer hover:border-blue-500 dark:hover:border-blue-500'}`}>
                 <CornerAccents className="border-zinc-300 dark:border-zinc-700 group-hover:border-blue-400 dark:group-hover:border-blue-400 transition-colors" />
                 <div className="absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-blue-50/50 dark:to-blue-900/10 opacity-0 group-hover:opacity-100 transition-opacity" />
                 
@@ -229,7 +229,8 @@ export const LeftPanel: React.FC<LeftPanelProps> = ({
                     multiple
                     onChange={handleFileSelect}
                     ref={fileInputRef}
-                    className="absolute inset-0 opacity-0 cursor-pointer z-10"
+                    className="absolute inset-0 opacity-0 cursor-pointer z-10 disabled:cursor-not-allowed"
+                    disabled={isAnalyzing}
                 />
                 
                 <div className="absolute inset-0 flex flex-col items-center justify-center gap-3">
