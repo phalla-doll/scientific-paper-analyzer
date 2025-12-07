@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Upload, Bot, AlertCircle, CheckCircle2, Sparkles, Send, RefreshCw, MessageSquare, FileText, X, Plus, Play } from 'lucide-react';
+import { Upload, Bot, AlertCircle, CheckCircle2, Sparkles, Send, RefreshCw, MessageSquare, FileText, X, Plus, Play, Download } from 'lucide-react';
 import { JsonDisplay } from './components/JsonDisplay';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { convertPdfToImages } from './utils/pdfUtils';
@@ -464,6 +464,17 @@ const App: React.FC = () => {
                          </span>
                       </button>
                     )}
+                </div>
+
+                <div className="flex justify-center pt-2">
+                  <a 
+                    href="/assets/sample_paper.pdf" 
+                    download
+                    className="flex items-center gap-1.5 text-[10px] text-zinc-600 hover:text-blue-400 transition-colors font-mono uppercase tracking-wide group"
+                  >
+                    <Download size={12} className="group-hover:animate-bounce" />
+                    <span>Download Sample PDF</span>
+                  </a>
                 </div>
             </>
           )}

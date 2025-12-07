@@ -3,7 +3,8 @@ import { PaperAnalysis, FigureData, DataPoint, MethodologyStage } from '../types
 import { trackEvent } from '../services/analytics';
 import { 
   Copy, Check, BarChart3, ImageIcon, ScanEye, ArrowRight, Microscope, Activity, 
-  FlaskConical, Binary, Layers, PenTool, Beaker, Download, Workflow, Settings2, Cpu
+  FlaskConical, Binary, Layers, PenTool, Beaker, Download, Workflow, Settings2, Cpu,
+  FileText
 } from 'lucide-react';
 
 interface JsonDisplayProps {
@@ -23,6 +24,7 @@ const CornerAccents = ({ color = "border-zinc-700", size = "w-1.5 h-1.5" }) => (
 export const JsonDisplay: React.FC<JsonDisplayProps> = ({ data }) => {
   const [copied, setCopied] = useState(false);
   const [rawCopied, setRawCopied] = useState(false);
+  const [summaryCopied, setSummaryCopied] = useState(false);
 
   const handleCopy = async () => {
     try {
@@ -41,6 +43,18 @@ export const JsonDisplay: React.FC<JsonDisplayProps> = ({ data }) => {
       setRawCopied(true);
       trackEvent('copy_raw_output');
       setTimeout(() => setRawCopied(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy text: ', err);
+    }
+  };
+
+  const handleCopySummary = async () => {
+    try {
+      const summaryText = `Hypothesis: ${data.core_hypothesis}\n\nKey Findings: ${data.key_results.join('; ')}\n\nConclusion: ${data.conclusions}`;
+      await navigator.clipboard.writeText(summaryText);
+      setSummaryCopied(true);
+      trackEvent('copy_summary_text', { paper_title: data.paper_title });
+      setTimeout(() => setSummaryCopied(false), 2000);
     } catch (err) {
       console.error('Failed to copy text: ', err);
     }
@@ -253,8 +267,39 @@ export const JsonDisplay: React.FC<JsonDisplayProps> = ({ data }) => {
         <h1 className="text-lg font-bold text-zinc-500 uppercase tracking-widest">Analysis Result</h1>
       </div>
 
+      <section className="relative mt-2 mb-6">
+        <div className="flex items-center justify-between mb-2">
+            <h3 className="text-xs font-bold uppercase tracking-widest text-zinc-600 flex items-center gap-2">
+                <FileText size={14} /> Executive Summary
+            </h3>
+            <button 
+                onClick={handleCopySummary}
+                className="group flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-zinc-600 hover:text-blue-400 transition-colors"
+                title="Copy Summary"
+            >
+                {summaryCopied ? <Check size={12} className="text-emerald-500" /> : <Copy size={12} />}
+                <span className={summaryCopied ? "text-emerald-500" : ""}>{summaryCopied ? "COPIED" : "COPY"}</span>
+            </button>
+        </div>
+        <div className="bg-zinc-900/30 border border-zinc-800 p-5 text-zinc-300 text-sm leading-relaxed relative hover:border-zinc-700 transition-colors">
+            <CornerAccents color="border-zinc-700" />
+            <p>
+                <span className="text-blue-400 font-bold uppercase text-[10px] tracking-wider mr-2">Hypothesis</span> 
+                {data.core_hypothesis}
+            </p>
+            <p className="mt-3">
+                <span className="text-blue-400 font-bold uppercase text-[10px] tracking-wider mr-2">Key Findings</span> 
+                {data.key_results.join('; ')}
+            </p>
+            <p className="mt-3">
+                <span className="text-blue-400 font-bold uppercase text-[10px] tracking-wider mr-2">Conclusion</span> 
+                {data.conclusions}
+            </p>
+        </div>
+      </section>
+
       <section className="relative">
-        <h3 className="text-xs font-bold uppercase tracking-widest text-zinc-600 mb-2">Core Hypothesis</h3>
+        <h3 className="text-xs font-bold uppercase tracking-widest text-zinc-600 mb-2">Core Hypothesis Detail</h3>
         <div className="bg-zinc-900/50 border-l-2 border-zinc-700 pl-4 py-2 text-zinc-200 leading-relaxed text-sm md:text-base">
           {data.core_hypothesis}
         </div>
