@@ -139,6 +139,7 @@ export const JsonDisplay = forwardRef<JsonDisplayRef, JsonDisplayProps>(({ data 
     const positives = values.filter(v => v > 0);
     const minPositive = positives.length > 0 ? Math.min(...positives) : 0.0001;
 
+    // Determine if Log Scale is needed (e.g. if max / min > 1000)
     const rangeRatio = minPositive > 0 ? maxValue / minPositive : 0;
     const useLogScale = minValue >= 0 && rangeRatio > 1000;
     
@@ -169,11 +170,14 @@ export const JsonDisplay = forwardRef<JsonDisplayRef, JsonDisplayProps>(({ data 
                  const logMin = Math.log10(minPositive);
                  const logMax = Math.log10(maxValue);
                  const logVal = Math.log10(p.value);
+                 // Normalize 0-1
                  const norm = logMax === logMin ? 1 : (logVal - logMin) / (logMax - logMin);
+                 // Min visible bar 10%
                  ratio = 0.1 + (0.9 * norm); 
               } else {
                  ratio = maxValue !== 0 ? p.value / maxValue : 0;
               }
+              // Clamp
               ratio = Math.max(0, Math.min(1, ratio));
 
               const filledCount = Math.round(ratio * maxBarChars);
@@ -206,6 +210,7 @@ export const JsonDisplay = forwardRef<JsonDisplayRef, JsonDisplayProps>(({ data 
             })}
           </div>
 
+          {/* Scale Axis */}
           <div className="grid grid-cols-[140px_1fr_auto] gap-4 mt-2 text-[9px] text-zinc-500 dark:text-zinc-600 font-mono min-w-fit">
             <div></div> {/* Spacer for Label */}
             <div className="flex justify-between tracking-tighter px-[1px]">
