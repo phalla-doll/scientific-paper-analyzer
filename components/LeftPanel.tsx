@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Bot, RefreshCw, MessageSquare, Send, FileText, X, Upload, Plus, Square, Play, Download, Sun, Moon, Cpu, ArrowRight } from 'lucide-react';
 import { ErrorBoundary } from './ErrorBoundary';
@@ -21,6 +22,8 @@ interface LeftPanelProps {
   chatEndRef: React.RefObject<HTMLDivElement>;
   isDarkMode: boolean;
   toggleTheme: () => void;
+  isOpen: boolean;
+  onClose: () => void;
 }
 
 export const LeftPanel: React.FC<LeftPanelProps> = ({
@@ -39,14 +42,28 @@ export const LeftPanel: React.FC<LeftPanelProps> = ({
   fileInputRef,
   chatEndRef,
   isDarkMode,
-  toggleTheme
+  toggleTheme,
+  isOpen,
+  onClose
 }) => {
   const isComplete = appState === AppState.COMPLETE;
   const isAnalyzing = appState === AppState.PROCESSING_PDF || appState === AppState.ANALYZING;
-  const isIdle = appState === AppState.IDLE || appState === AppState.ERROR;
-
+  
   return (
-    <div className="w-[28%] min-w-[320px] max-w-[450px] border-r border-zinc-200 dark:border-zinc-800 flex flex-col bg-white/50 dark:bg-zinc-900/50 h-full z-10 shadow-[4px_0_24px_-4px_rgba(0,0,0,0.1)] dark:shadow-[4px_0_24px_-4px_rgba(0,0,0,0.3)] backdrop-blur-sm transition-colors duration-300">
+    <div 
+        className={`
+            fixed inset-y-0 left-0 z-40 h-full
+            w-[85%] md:w-[28%] md:min-w-[320px] md:max-w-[450px]
+            bg-white/95 dark:bg-zinc-900/95 md:bg-white/50 md:dark:bg-zinc-900/50
+            backdrop-blur-xl md:backdrop-blur-sm
+            border-r border-zinc-200 dark:border-zinc-800
+            flex flex-col
+            shadow-2xl md:shadow-[4px_0_24px_-4px_rgba(0,0,0,0.1)] dark:md:shadow-[4px_0_24px_-4px_rgba(0,0,0,0.3)]
+            transition-all duration-300 ease-in-out
+            ${isOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
+            md:relative
+        `}
+    >
       
       {/* Header */}
       <div className="p-6 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between">
@@ -79,6 +96,14 @@ export const LeftPanel: React.FC<LeftPanelProps> = ({
                 <RefreshCw size={16} />
             </button>
           )}
+
+          {/* Mobile Close Button */}
+          <button
+            onClick={onClose}
+            className="md:hidden p-2 flex items-center justify-center text-zinc-500 hover:text-red-500 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+          >
+            <X size={20} />
+          </button>
         </div>
       </div>
 
@@ -169,7 +194,7 @@ export const LeftPanel: React.FC<LeftPanelProps> = ({
         <div className="mt-4 pt-4 border-t border-dashed border-zinc-200 dark:border-zinc-800 flex justify-between items-center text-[10px] text-zinc-400 dark:text-zinc-600 font-mono tracking-widest uppercase">
           <div className="flex items-center gap-1">
              <Cpu size={10} />
-             <span>System v1.0.0</span>
+             <span>System v3.0.4</span>
           </div>
           <div className="flex items-center gap-1">
             <span>Made with Gemini-3 by </span>
@@ -260,7 +285,7 @@ export const LeftPanel: React.FC<LeftPanelProps> = ({
          {selectedFiles.length > 0 && !isAnalyzing && (
              <button
                 onClick={handleAnalyzeFiles}
-                className="w-full relative py-3 bg-blue-600 hover:bg-blue-500 text-white uppercase tracking-widest text-xs font-bold transition-all group overflow-hidden leading-none"
+                className="w-full relative py-3 bg-blue-600 hover:bg-blue-500 text-white uppercase tracking-widest text-xs font-bold transition-all group overflow-hidden leading-none flex items-center justify-center"
              >
                 <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20"></div>
                 <CornerAccents className="border-blue-300 group-hover:border-white" size="w-1 h-1" />
@@ -275,7 +300,7 @@ export const LeftPanel: React.FC<LeftPanelProps> = ({
          {isAnalyzing && (
              <button
                 onClick={handleCancelAnalysis}
-                className="w-full relative py-3 bg-red-600 hover:bg-red-500 text-white uppercase tracking-widest text-xs font-bold transition-all group overflow-hidden animate-in fade-in leading-none"
+                className="w-full relative py-3 bg-red-600 hover:bg-red-500 text-white uppercase tracking-widest text-xs font-bold transition-all group overflow-hidden animate-in fade-in leading-none flex items-center justify-center"
              >
                 <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20"></div>
                 <CornerAccents className="border-red-300 group-hover:border-white" size="w-1 h-1" />

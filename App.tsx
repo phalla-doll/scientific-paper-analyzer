@@ -31,6 +31,9 @@ const App: React.FC = () => {
   const [stickyCopied, setStickyCopied] = useState(false);
   const [errorDetail, setErrorDetail] = useState<any>(null);
   
+  // Mobile Sidebar State
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+  
   // Theme State
   const [isDarkMode, setIsDarkMode] = useState<boolean>(true);
   
@@ -69,6 +72,10 @@ const App: React.FC = () => {
   const toggleTheme = () => {
     setIsDarkMode(prev => !prev);
     trackEvent('theme_toggled', { mode: !isDarkMode ? 'dark' : 'light' });
+  };
+
+  const toggleMobileSidebar = () => {
+    setIsMobileSidebarOpen(prev => !prev);
   };
 
   useEffect(() => {
@@ -129,6 +136,9 @@ const App: React.FC = () => {
       trackEvent('rate_limit_hit', { type: 'text' });
       return;
     }
+
+    // Close sidebar on mobile when action starts
+    setIsMobileSidebarOpen(false);
 
     const currentId = Date.now();
     analysisIdRef.current = currentId;
@@ -195,6 +205,9 @@ const App: React.FC = () => {
       trackEvent('rate_limit_hit', { type: 'pdf' });
       return;
     }
+
+    // Close sidebar on mobile when action starts
+    setIsMobileSidebarOpen(false);
 
     const currentId = Date.now();
     analysisIdRef.current = currentId;
@@ -278,6 +291,7 @@ const App: React.FC = () => {
     setAppState(AppState.IDLE);
     setShowStickyActions(false);
     analysisIdRef.current = 0;
+    setIsMobileSidebarOpen(false); // Close sidebar on reset
     setMessages([{
       id: 'reset',
       role: 'system',
@@ -302,8 +316,16 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="flex h-screen w-full bg-zinc-50 dark:bg-[#09090b] text-zinc-800 dark:text-zinc-200 overflow-hidden font-sans tracking-wide selection:bg-blue-500/30 transition-colors duration-300">
+    <div className="flex h-screen w-full bg-zinc-50 dark:bg-[#09090b] text-zinc-800 dark:text-zinc-200 overflow-hidden font-sans tracking-wide selection:bg-blue-500/30 transition-colors duration-300 relative">
       
+      {/* Mobile Sidebar Overlay */}
+      {isMobileSidebarOpen && (
+        <div 
+            className="fixed inset-0 bg-black/60 z-30 md:hidden backdrop-blur-sm animate-in fade-in duration-200"
+            onClick={() => setIsMobileSidebarOpen(false)}
+        />
+      )}
+
       <LeftPanel 
         appState={appState}
         messages={messages}
@@ -321,6 +343,8 @@ const App: React.FC = () => {
         chatEndRef={chatEndRef}
         isDarkMode={isDarkMode}
         toggleTheme={toggleTheme}
+        isOpen={isMobileSidebarOpen}
+        onClose={() => setIsMobileSidebarOpen(false)}
       />
 
       <RightPanel 
@@ -344,6 +368,7 @@ const App: React.FC = () => {
         onDownloadReport={() => jsonDisplayRef.current?.downloadReport()}
         headerText={getHeaderText()}
         onScroll={handleScroll}
+        onOpenSidebar={toggleMobileSidebar}
       />
     </div>
   );

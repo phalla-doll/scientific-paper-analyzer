@@ -1,3 +1,4 @@
+
 import React, { useState, forwardRef, useImperativeHandle } from 'react';
 import { PaperAnalysis, FigureData, DataPoint, MethodologyStage } from '../types';
 import { trackEvent } from '../services/analytics';
@@ -158,10 +159,10 @@ export const JsonDisplay = forwardRef<JsonDisplayRef, JsonDisplayProps>(({ data 
             )}
         </div>
         
-        <div className="font-mono text-xs bg-zinc-50 dark:bg-zinc-950/50 p-4 border border-zinc-200 dark:border-zinc-800/80 relative transition-colors">
+        <div className="font-mono text-xs bg-zinc-50 dark:bg-zinc-950/50 p-4 border border-zinc-200 dark:border-zinc-800/80 relative transition-colors overflow-x-auto">
           <CornerAccents className="border-zinc-300 dark:border-zinc-700" size="w-1 h-1" />
           
-          <div className="space-y-1">
+          <div className="space-y-1 min-w-fit">
             {validPoints.map((p, idx) => {
               let ratio = 0;
               if (useLogScale && p.value > 0) {
@@ -205,7 +206,7 @@ export const JsonDisplay = forwardRef<JsonDisplayRef, JsonDisplayProps>(({ data 
             })}
           </div>
 
-          <div className="grid grid-cols-[140px_1fr_auto] gap-4 mt-2 text-[9px] text-zinc-500 dark:text-zinc-600 font-mono">
+          <div className="grid grid-cols-[140px_1fr_auto] gap-4 mt-2 text-[9px] text-zinc-500 dark:text-zinc-600 font-mono min-w-fit">
             <div></div> {/* Spacer for Label */}
             <div className="flex justify-between tracking-tighter px-[1px]">
                <span>{useLogScale ? minPositive.toExponential(0) : 0}</span>

@@ -1,5 +1,6 @@
+
 import React from 'react';
-import { Sparkles, Copy, Download, Check, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Sparkles, Copy, Download, Check, CheckCircle2, AlertCircle, Menu } from 'lucide-react';
 import { JsonDisplay, JsonDisplayRef } from './JsonDisplay';
 import { ErrorBoundary } from './ErrorBoundary';
 import { AnalysisLoader } from './AnalysisLoader';
@@ -19,6 +20,7 @@ interface RightPanelProps {
   onDownloadReport: () => void;
   headerText: string;
   onScroll: () => void;
+  onOpenSidebar: () => void;
 }
 
 export const RightPanel: React.FC<RightPanelProps> = ({
@@ -33,7 +35,8 @@ export const RightPanel: React.FC<RightPanelProps> = ({
   onCopyJson,
   onDownloadReport,
   headerText,
-  onScroll
+  onScroll,
+  onOpenSidebar
 }) => {
   return (
     <div 
@@ -43,6 +46,14 @@ export const RightPanel: React.FC<RightPanelProps> = ({
     >
       {!analysis && appState === AppState.IDLE ? (
         <div className="h-full flex flex-col items-center justify-center text-zinc-600">
+          <div className="md:hidden absolute top-6 left-6">
+            <button 
+                onClick={onOpenSidebar} 
+                className="p-2 -ml-2 text-zinc-500 hover:text-blue-500 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+            >
+                <Menu size={24} />
+            </button>
+          </div>
           <div className="w-16 h-16 border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 flex items-center justify-center mb-6 relative transition-colors">
             <CornerAccents className="border-zinc-300 dark:border-zinc-700" />
             <Sparkles size={24} className="text-zinc-400 dark:text-zinc-600" />
@@ -55,6 +66,14 @@ export const RightPanel: React.FC<RightPanelProps> = ({
           <div className="flex items-center justify-between mb-8 sticky top-0 bg-zinc-50/95 dark:bg-[#09090b]/95 backdrop-blur z-20 py-4 border-b border-zinc-200 dark:border-zinc-800 transition-all">
               {/* Left Side: Title + Action Buttons */}
               <div className="flex items-center gap-4 flex-1 min-w-0 mr-4">
+                  {/* Mobile Menu Button */}
+                  <button 
+                    onClick={onOpenSidebar} 
+                    className="md:hidden p-2 -ml-2 text-zinc-500 hover:text-blue-500 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+                  >
+                    <Menu size={20} />
+                  </button>
+
                   <h2 className="text-xs font-mono text-zinc-600 dark:text-zinc-500 truncate max-w-md uppercase">
                      {headerText}
                   </h2>
@@ -93,7 +112,8 @@ export const RightPanel: React.FC<RightPanelProps> = ({
                      <span className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 px-3 py-1 bg-emerald-50 border border-emerald-200 dark:bg-emerald-950/30 dark:border-emerald-900 relative">
                         <CornerAccents className="border-emerald-300 dark:border-emerald-800" size="w-0.5 h-0.5" />
                         <CheckCircle2 size={10} />
-                        Analysis Complete
+                        <span className="hidden sm:inline">Analysis Complete</span>
+                        <span className="sm:hidden">Done</span>
                      </span>
                  )}
                  {appState === AppState.ERROR && (
