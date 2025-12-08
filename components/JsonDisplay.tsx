@@ -181,7 +181,7 @@ export const JsonDisplay = forwardRef<JsonDisplayRef, JsonDisplayProps>(({ data 
               const empty = '░'.repeat(Math.max(0, emptyCount));
 
               return (
-                <div key={idx} className="grid grid-cols-[120px_1fr_auto] gap-4 hover:bg-zinc-100 dark:hover:bg-zinc-900 py-0.5 transition-colors group items-center">
+                <div key={idx} className="grid grid-cols-[140px_1fr_auto] gap-4 hover:bg-zinc-100 dark:hover:bg-zinc-900 py-0.5 transition-colors group items-center">
                    {/* Label Column */}
                    <div className="text-right border-r border-zinc-200 dark:border-zinc-800 pr-3 group-hover:border-zinc-300 dark:group-hover:border-zinc-700 transition-colors">
                      <span className="text-zinc-500 dark:text-zinc-400 truncate block" title={p.label}>{p.label}</span>
@@ -205,7 +205,7 @@ export const JsonDisplay = forwardRef<JsonDisplayRef, JsonDisplayProps>(({ data 
             })}
           </div>
 
-          <div className="grid grid-cols-[120px_1fr_auto] gap-4 mt-2 text-[9px] text-zinc-500 dark:text-zinc-600 font-mono">
+          <div className="grid grid-cols-[140px_1fr_auto] gap-4 mt-2 text-[9px] text-zinc-500 dark:text-zinc-600 font-mono">
             <div></div> {/* Spacer for Label */}
             <div className="flex justify-between tracking-tighter px-[1px]">
                <span>{useLogScale ? minPositive.toExponential(0) : 0}</span>
@@ -393,6 +393,18 @@ export const JsonDisplay = forwardRef<JsonDisplayRef, JsonDisplayProps>(({ data 
                  badgeStyles = "text-orange-600 border-orange-200 bg-orange-50 dark:text-orange-400 dark:border-orange-900/50 dark:bg-orange-950/20";
              }
 
+             // Ensure findings is treated as an array of strings, splitting by sentences if it comes as a paragraph
+             const findingsList = Array.isArray(fig.findings) 
+                ? fig.findings 
+                : (typeof (fig as any).observation === 'string' ? [(fig as any).observation] : (typeof fig.findings === 'string' ? [fig.findings] : []));
+             
+             // Detailed breakdown parsing: Split long strings by periods if they are not already list items
+             const detailedFindings = findingsList.flatMap(f => 
+                f.length > 50 && f.includes('. ') 
+                   ? f.split(/(?:\. )|(?:\.\n)/).filter(s => s.trim().length > 0).map(s => s.trim().endsWith('.') ? s.trim() : s.trim() + '.')
+                   : [f]
+             );
+
              return (
                 <div key={idx} className="group relative bg-white dark:bg-zinc-900/30 border border-zinc-200 dark:border-zinc-800 p-6 transition-all duration-200 hover:border-zinc-400 dark:hover:border-zinc-600">
                     <CornerAccents className="border-zinc-300 dark:border-zinc-800 group-hover:border-zinc-400 dark:group-hover:border-zinc-600" />
@@ -419,20 +431,19 @@ export const JsonDisplay = forwardRef<JsonDisplayRef, JsonDisplayProps>(({ data 
                       <div className="mb-4">
                          <div className="flex items-center gap-2 mb-2">
                             <ScanEye size={14} className="text-zinc-500 dark:text-zinc-600" />
-                            <span className="text-[10px] font-bold uppercase text-zinc-500 dark:text-zinc-600 tracking-widest">Findings</span>
+                            <span className="text-[10px] font-bold uppercase text-zinc-500 dark:text-zinc-600 tracking-widest">Visual Analysis</span>
                          </div>
-                         {Array.isArray(fig.findings) ? (
-                            <ul className="space-y-1.5">
-                              {fig.findings.map((finding: string, fIdx: number) => (
-                                <li key={fIdx} className="text-sm text-zinc-600 dark:text-zinc-400 flex gap-2 items-start">
-                                  <ArrowRight size={14} className="mt-1 text-zinc-400 dark:text-zinc-700 shrink-0" />
-                                  <span>{finding}</span>
-                                </li>
-                              ))}
-                            </ul>
-                         ) : (
-                            <p className="text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed">{(fig as any).observation || (fig as any).findings}</p>
-                         )}
+                         
+                         <ul className="space-y-2">
+                           {detailedFindings.length > 0 ? detailedFindings.map((finding: string, fIdx: number) => (
+                             <li key={fIdx} className="text-sm text-zinc-600 dark:text-zinc-400 flex gap-2 items-start leading-relaxed">
+                               <ArrowRight size={14} className="mt-1 text-zinc-400 dark:text-zinc-600 shrink-0 opacity-70" />
+                               <span>{finding}</span>
+                             </li>
+                           )) : (
+                             <li className="text-sm text-zinc-500 italic">No detailed findings available.</li>
+                           )}
+                         </ul>
                       </div>
                       
                       {renderDataChart(fig.data_points || [])}
