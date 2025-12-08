@@ -1,8 +1,10 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import { JsonDisplayRef } from './components/JsonDisplay';
 import { convertPdfToImages } from './utils/pdfUtils';
 import { analyzePaper, chatWithPaper } from './services/geminiService';
 import { trackEvent } from './services/analytics';
+import { checkRateLimit, recordUsage } from './services/rateLimiter';
 import { Message, PaperAnalysis, AppState } from './types';
 import { LeftPanel } from './components/LeftPanel';
 import { RightPanel } from './components/RightPanel';
@@ -116,6 +118,14 @@ const App: React.FC = () => {
   const handleTextAnalyze = async () => {
     if (!inputText.trim()) return;
 
+    // Security: Rate Limit Check
+    const limitCheck = checkRateLimit();
+    if (!limitCheck.allowed) {
+      addMessage('system', `⚠️ Security Alert: ${limitCheck.reason}`);
+      trackEvent('rate_limit_hit', { type: 'text' });
+      return;
+    }
+
     const currentId = Date.now();
     analysisIdRef.current = currentId;
 
@@ -137,6 +147,7 @@ const App: React.FC = () => {
       const result = await analyzePaper({ text: textToAnalyze });
       if (analysisIdRef.current !== currentId) return;
 
+      recordUsage('text'); // Record successful usage
       setAnalysis(result);
       setAppState(AppState.COMPLETE);
       addMessage('assistant', 'Analysis complete. You can now ask questions about the paper below.');
@@ -173,6 +184,14 @@ const App: React.FC = () => {
   const handleAnalyzeFiles = async () => {
     if (selectedFiles.length === 0) return;
 
+    // Security: Rate Limit Check
+    const limitCheck = checkRateLimit();
+    if (!limitCheck.allowed) {
+      addMessage('system', `⚠️ Security Alert: ${limitCheck.reason}`);
+      trackEvent('rate_limit_hit', { type: 'pdf' });
+      return;
+    }
+
     const currentId = Date.now();
     analysisIdRef.current = currentId;
 
@@ -196,6 +215,7 @@ const App: React.FC = () => {
       const result = await analyzePaper({ images });
       if (analysisIdRef.current !== currentId) return;
       
+      recordUsage('pdf'); // Record successful usage
       setAnalysis(result);
       setAppState(AppState.COMPLETE);
       addMessage('assistant', 'Analysis complete. Structured data extracted.');
