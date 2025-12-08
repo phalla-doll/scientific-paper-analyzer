@@ -9,6 +9,10 @@ import { Message, PaperAnalysis, AppState } from './types';
 import { LeftPanel } from './components/LeftPanel';
 import { RightPanel } from './components/RightPanel';
 
+// Configuration for limits
+const MAX_PAGES_PER_FILE = 20;
+const MAX_TOTAL_PAGES_BATCH = 60;
+
 const App: React.FC = () => {
   const [appState, setAppState] = useState<AppState>(AppState.IDLE);
   const [messages, setMessages] = useState<Message[]>([
@@ -204,15 +208,39 @@ const App: React.FC = () => {
     trackEvent('batch_analysis_started', { file_count: selectedFiles.length });
 
     try {
-      const allImagesArrays = await Promise.all(selectedFiles.map(f => convertPdfToImages(f)));
+      // Process PDF conversions
+      const conversionResults = await Promise.all(
+        selectedFiles.map(f => convertPdfToImages(f, MAX_PAGES_PER_FILE))
+      );
+      
       if (analysisIdRef.current !== currentId) return;
 
-      const images = allImagesArrays.flat();
-      
+      let allImages: string[] = [];
+      const warnings: string[] = [];
+
+      // Check per-file truncation and aggregate images
+      conversionResults.forEach((res, index) => {
+        if (res.truncated) {
+          warnings.push(`"${selectedFiles[index].name}" truncated to first ${MAX_PAGES_PER_FILE} pages.`);
+        }
+        allImages.push(...res.images);
+      });
+
+      // Check total batch limit
+      if (allImages.length > MAX_TOTAL_PAGES_BATCH) {
+        allImages = allImages.slice(0, MAX_TOTAL_PAGES_BATCH);
+        warnings.push(`Total batch limit exceeded. Analyzing first ${MAX_TOTAL_PAGES_BATCH} pages only.`);
+      }
+
+      // Display system warnings if any limits were hit
+      if (warnings.length > 0) {
+        addMessage('system', `⚠️ Limit Notice: ${warnings.join(' ')}`);
+      }
+
       setAppState(AppState.ANALYZING);
-      addMessage('assistant', `Derendering documents (${images.length} total pages) and interpreting visuals...`);
+      addMessage('assistant', `Derendering ${allImages.length} pages and interpreting visuals...`);
       
-      const result = await analyzePaper({ images });
+      const result = await analyzePaper({ images: allImages });
       if (analysisIdRef.current !== currentId) return;
       
       recordUsage('pdf'); // Record successful usage
@@ -220,7 +248,7 @@ const App: React.FC = () => {
       setAppState(AppState.COMPLETE);
       addMessage('assistant', 'Analysis complete. Structured data extracted.');
       addMessage('assistant', 'System is ready for Q&A. Type below to query the documents.');
-      trackEvent('analyze_pdf_completed', { page_count: images.length, paper_title: result.paper_title });
+      trackEvent('analyze_pdf_completed', { page_count: allImages.length, paper_title: result.paper_title });
 
     } catch (error: any) {
       if (analysisIdRef.current !== currentId) return;

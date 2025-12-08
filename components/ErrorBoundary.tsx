@@ -1,14 +1,6 @@
-import React, { ErrorInfo, ReactNode } from 'react';
+import React, { Component, ErrorInfo, ReactNode } from 'react';
 import { AlertCircle, RefreshCw } from 'lucide-react';
-
-const CornerAccents = ({ className = "border-red-900", size = "w-1.5 h-1.5" }) => (
-  <>
-    <div className={`absolute top-0 left-0 ${size} border-l border-t ${className}`} />
-    <div className={`absolute top-0 right-0 ${size} border-r border-t ${className}`} />
-    <div className={`absolute bottom-0 left-0 ${size} border-l border-b ${className}`} />
-    <div className={`absolute bottom-0 right-0 ${size} border-r border-b ${className}`} />
-  </>
-);
+import { CornerAccents } from './CornerAccents';
 
 interface Props {
   children?: ReactNode;
@@ -22,11 +14,14 @@ interface State {
   error: Error | null;
 }
 
-export class ErrorBoundary extends React.Component<Props, State> {
-  state: State = {
-    hasError: false,
-    error: null
-  };
+export class ErrorBoundary extends Component<Props, State> {
+  constructor(props: Props) {
+    super(props);
+    this.state = {
+      hasError: false,
+      error: null
+    };
+  }
 
   static getDerivedStateFromError(error: Error): State {
     return { hasError: true, error };
