@@ -10,8 +10,8 @@ import { LeftPanel } from './components/LeftPanel';
 import { RightPanel } from './components/RightPanel';
 
 // Configuration for limits
-const MAX_PAGES_PER_FILE = 20;
-const MAX_TOTAL_PAGES_BATCH = 60;
+const MAX_PAGES_PER_FILE = 40;
+const MAX_TOTAL_PAGES_BATCH = 80;
 
 const App: React.FC = () => {
   const [appState, setAppState] = useState<AppState>(AppState.IDLE);
@@ -178,7 +178,7 @@ const App: React.FC = () => {
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
-      const newFiles = Array.from(e.target.files).filter((f: File) => f.type === 'application/pdf');
+      const newFiles = Array.from(e.target.files as FileList).filter((f: File) => f.type === 'application/pdf');
       
       if (newFiles.length === 0) {
          addMessage('system', 'Please upload valid PDF files.');

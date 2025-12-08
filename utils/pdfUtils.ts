@@ -1,3 +1,4 @@
+
 import * as pdfjsLib from 'pdfjs-dist';
 
 // Set worker source to a matching version from unpkg which mirrors npm structure reliably.
@@ -11,7 +12,7 @@ interface ConversionResult {
   totalPages: number;
 }
 
-export const convertPdfToImages = async (file: File, maxPages: number = 20): Promise<ConversionResult> => {
+export const convertPdfToImages = async (file: File, maxPages: number = 40): Promise<ConversionResult> => {
   const arrayBuffer = await file.arrayBuffer();
   
   // Loading the document.
